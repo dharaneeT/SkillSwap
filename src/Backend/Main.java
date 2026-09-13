@@ -1,28 +1,89 @@
-//import java.util.Scanner;
+class User {
+
+	private String name;
+	private int age;
+
+	User(String name, int age) {
+		this.name = name;
+		this.age = age;
+	}
+
+	String getName() {
+		return name;
+	}
+
+	void setName(String name) {
+		this.name = name;
+	}
+
+	int getAge() {
+		return age;
+	}
+
+	void setAge(int age) {
+		this.age = age;
+	}
+}
+
+class Skill {
+
+	private String skillName;
+
+	Skill(String skillName) {
+		this.skillName = skillName;
+	}
+
+	String getSkillName() {
+		return skillName;
+	}
+}
+
+public class Day3 {
+
+	public static void main(String[] args) {
+		User u = new User("Dharanee", 21);
+		u.setAge(22);
+
+		Skill s = new Skill("Java");
+
+		System.out.println(u.getName() + " " + u.getAge());
+		System.out.println(s.getSkillName());
+	}
+}
+//class User {
+//    private String name;
+//    private int age;
 //
-//public class Main {
+//    User(String name,int age){
+//        this.name=name;
+//        this.age=age;
+//    }
+//
+//    String getName(){return name;}
+//    void setName(String name){this.name=name;}
+//
+//    int getAge(){return age;}
+//    void setAge(int age){this.age=age;}
+//}
+//
+//class Skill {
+//    private String skillName;
+//
+//    Skill(String skillName){
+//        this.skillName=skillName;
+//    }
+//
+//    String getSkillName(){return skillName;}
+//}
+//
+//public class Main{
 //    public static void main(String[] args) {
+//        User u=new User("Dharanee",21);
+//        u.setAge(22);
 //
-//        Scanner sc = new Scanner(System.in);
+//        Skill s=new Skill("Java");
 //
-//        System.out.print("Enter your age: ");
-//        int age = sc.nextInt();
-//
-//        System.out.print("Enter your height: ");
-//        double height = sc.nextDouble();
-//
-//
-//        double ageInDouble = (double) age;
-//        int heightInt = (int) height;
-//
-//        int nextYearAge = age + 1;
-//
-//        int bonusYears = age + 5;
-//        int halfAge = age / 2;
-//
-//        System.out.println("Age after 5 years: " + bonusYears);
-//        System.out.println("Half of your age: " + halfAge);
-//
-//        sc.close();
+//        System.out.println(u.getName()+" "+u.getAge());
+//        System.out.println(s.getSkillName());
 //    }
 //}
