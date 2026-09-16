@@ -1,3 +1,87 @@
+package Backend;
+
+import java.util.*;
+
+class User {
+    String name;
+    List<String> skillsOffered = new ArrayList<>();
+    List<String> skillsWanted = new ArrayList<>();
+
+    public User(String name) {
+        this.name = name;
+    }
+}
+
+
+class SkillMatcher {
+
+    List<User> users = new ArrayList<>();
+
+    void addUser(User user) {
+        users.add(user);
+    }
+
+    void matchUsers() {
+
+        for (User u1 : users) {
+
+            for (User u2 : users) {
+
+                if (u1 == u2) continue;
+
+                for (String skill : u1.skillsWanted) {
+
+                    if (u2.skillsOffered.contains(skill)) {
+                        System.out.println(
+                                u1.name + " matches with " + u2.name +
+                                        " for skill: " + skill
+                        );
+                    }
+                }
+            }
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        SkillMatcher matcher = new SkillMatcher();
+
+        User a = new User("Alice");
+        a.skillsWanted.add("Java");
+        a.skillsOffered.add("React");
+
+        User b = new User("Bob");
+        b.skillsWanted.add("React");
+        b.skillsOffered.add("Java");
+
+        User c = new User("Charlie");
+        c.skillsOffered.add("Python");
+
+        matcher.addUser(a);
+        matcher.addUser(b);
+        matcher.addUser(c);
+
+        matcher.matchUsers();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //class InvalidSkillException extends RuntimeException {
 //    public InvalidSkillException(String message) {
 //        super(message);
