@@ -20,7 +20,11 @@ public class ReviewController {
 	}
 
 	@PostMapping("/add")
-	public Review addReview(@RequestParam int sessionId, @RequestParam int ratings, @RequestParam String comment) {
+	public Review addReview(
+		@RequestParam Integer sessionId,
+		@RequestParam Integer ratings,
+		@RequestParam String comment
+	) {
 		return reviewService.addReview(sessionId, ratings, comment);
 	}
 }

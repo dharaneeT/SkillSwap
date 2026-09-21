@@ -18,19 +18,23 @@ public class SessionController {
 
 	//booking session
 	@PostMapping("/book-session")
-	public Session bookSession(@RequestParam int providerId, @RequestParam int learnerId, @RequestParam int skillId) {
+	public Session bookSession(
+		@RequestParam Integer providerId,
+		@RequestParam Integer learnerId,
+		@RequestParam Integer skillId
+	) {
 		return sessionService.bookSession(providerId, learnerId, skillId);
 	}
 
 	//accepting session
 	@PutMapping("/accept/{sessionId}")
-	public Session acceptSession(@PathVariable int sessionId) {
+	public Session acceptSession(@PathVariable Integer sessionId) {
 		return sessionService.acceptSession(sessionId);
 	}
 
 	//complete session
 	@PutMapping("/complete/{sessionId}")
-	public Session completeSession(@PathVariable int sessionId) {
+	public Session completeSession(@PathVariable Integer sessionId) {
 		return sessionService.completeSession(sessionId);
 	}
 }

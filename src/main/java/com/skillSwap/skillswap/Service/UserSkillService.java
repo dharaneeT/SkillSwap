@@ -26,7 +26,7 @@ public class UserSkillService {
 		this.skillService = skillService;
 	}
 
-	public UserSkill addUserSkill(int userId, int skillId, SkillType type) {
+	public UserSkill addUserSkill(Integer userId, Integer skillId, SkillType type) {
 		User user = userService.getUserById(userId);
 		Skill skill = skillService.getSkillById(skillId);
 

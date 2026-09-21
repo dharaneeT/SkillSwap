@@ -28,7 +28,7 @@ public class SkillController {
 	}
 
 	@GetMapping("/getskill/{id}")
-	public Skill getSkillById(@PathVariable int id) {
+	public Skill getSkillById(@PathVariable Integer id) {
 		return skillService.getSkillById(id);
 	}
 }

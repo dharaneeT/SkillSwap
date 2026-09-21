@@ -16,7 +16,7 @@ public class ReviewService {
 	@Autowired
 	private SessionRepository sessionRepository;
 
-	public Review addReview(int sessionId, int ratings, String comment) {
+	public Review addReview(Integer sessionId, Integer ratings, String comment) {
 		Session session = sessionRepository
 			.findById(sessionId)
 			.orElseThrow(() -> new RuntimeException("Session Not Found"));

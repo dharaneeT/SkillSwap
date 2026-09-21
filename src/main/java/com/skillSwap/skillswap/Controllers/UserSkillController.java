@@ -21,7 +21,11 @@ public class UserSkillController {
 	}
 
 	@PostMapping
-	public UserSkill addUserSkill(@RequestParam int userId, @RequestParam int skillId, @RequestParam SkillType type) {
+	public UserSkill addUserSkill(
+		@RequestParam Integer userId,
+		@RequestParam Integer skillId,
+		@RequestParam SkillType type
+	) {
 		return userSkillService.addUserSkill(userId, skillId, type);
 	}
 }

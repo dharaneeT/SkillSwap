@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Review {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    private int rating;
-    private String comment;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    @OneToOne
-    @JoinColumn(name = "session_id")
-    private Session session;
+	private Integer rating;
+	private String comment;
 
+	@OneToOne
+	@JoinColumn(name = "session_id")
+	private Session session;
 }

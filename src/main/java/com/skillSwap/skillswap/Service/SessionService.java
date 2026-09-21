@@ -28,7 +28,7 @@ public class SessionService {
 	}
 
 	//Book Session
-	public Session bookSession(int providerId, int learnerId, int skillId) {
+	public Session bookSession(Integer providerId, Integer learnerId, Integer skillId) {
 		User provider = userService.getUserById(providerId);
 		User learner = userService.getUserById(learnerId);
 		Skill skill = skillService.getSkillById(skillId);
@@ -44,7 +44,7 @@ public class SessionService {
 	}
 
 	//Accept Session
-	public Session acceptSession(int sessionId) {
+	public Session acceptSession(Integer sessionId) {
 		Session session = sessionRepository
 			.findById(sessionId)
 			.orElseThrow(() -> new RuntimeException("Session not found"));
@@ -54,7 +54,7 @@ public class SessionService {
 	}
 
 	//Complete Session
-	public Session completeSession(int sessionId) {
+	public Session completeSession(Integer sessionId) {
 		Session session = sessionRepository
 			.findById(sessionId)
 			.orElseThrow(() -> new RuntimeException("Session is Not Found"));

@@ -14,7 +14,7 @@ public class Session {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer id;
 
 	// Who teaches
 	@ManyToOne
