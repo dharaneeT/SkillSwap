@@ -20,8 +20,8 @@ public class UserSkillController {
 		this.userSkillService = userSkillService;
 	}
 
-	@PostMapping("/add")
-	public UserSkill addUserSkill(@RequestParam int userID, @RequestParam int skillId, @RequestParam SkillType type) {
-		return userSkillService.addUserSkill(userID, skillId, type);
+	@PostMapping
+	public UserSkill addUserSkill(@RequestParam int userId, @RequestParam int skillId, @RequestParam SkillType type) {
+		return userSkillService.addUserSkill(userId, skillId, type);
 	}
 }

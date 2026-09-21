@@ -23,13 +23,13 @@ public class SessionController {
 	}
 
 	//accepting session
-	@PutMapping("/accept/{id}")
+	@PutMapping("/accept/{sessionId}")
 	public Session acceptSession(@PathVariable int sessionId) {
 		return sessionService.acceptSession(sessionId);
 	}
 
 	//complete session
-	@PutMapping("/complete/{id}")
+	@PutMapping("/complete/{sessionId}")
 	public Session completeSession(@PathVariable int sessionId) {
 		return sessionService.completeSession(sessionId);
 	}

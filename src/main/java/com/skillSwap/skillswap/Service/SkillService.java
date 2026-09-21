@@ -27,4 +27,8 @@ public class SkillService {
 	public Skill getSkillById(int id) {
 		return skillRepository.findById(id).orElseThrow(() -> new RuntimeException("Skill Not Found"));
 	}
+	//	public String deleteSkill(int id) {
+	//		skillRepository.deleteById(id);
+	//		return "Skill Deleted Succesfully";
+	//	}
 }
