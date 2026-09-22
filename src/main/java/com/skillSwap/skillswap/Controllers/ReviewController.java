@@ -1,12 +1,12 @@
 package com.skillSwap.skillswap.Controllers;
 
+import com.skillSwap.skillswap.Dto.response.ApiResponse;
+import com.skillSwap.skillswap.Dto.review.ReviewRequestDTO;
+import com.skillSwap.skillswap.Dto.review.ReviewResponseDTO;
 import com.skillSwap.skillswap.Entity.Review;
 import com.skillSwap.skillswap.Service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/skillswap/v1/review")
@@ -20,11 +20,7 @@ public class ReviewController {
 	}
 
 	@PostMapping("/add")
-	public Review addReview(
-		@RequestParam Integer sessionId,
-		@RequestParam Integer ratings,
-		@RequestParam String comment
-	) {
-		return reviewService.addReview(sessionId, ratings, comment);
+	public ApiResponse<ReviewResponseDTO> addReview(@RequestBody ReviewRequestDTO dto) {
+		return new ApiResponse<>(true, "Review Added", reviewService.addReview(dto));
 	}
 }

@@ -1,5 +1,8 @@
 package com.skillSwap.skillswap.Controllers;
 
+import com.skillSwap.skillswap.Dto.response.ApiResponse;
+import com.skillSwap.skillswap.Dto.user.UserRequestDTO;
+import com.skillSwap.skillswap.Dto.user.UserResponseDTO;
 import com.skillSwap.skillswap.Entity.User;
 import com.skillSwap.skillswap.Service.UserService;
 import java.util.List;
@@ -17,18 +20,21 @@ public class UserController {
 		this.userService = userService;
 	}
 
+	//CREATE USER
 	@PostMapping("/add")
-	public User createUser(@RequestBody User user) {
-		return userService.createUser(user);
+	public ApiResponse<UserResponseDTO> createUser(@RequestBody UserRequestDTO dto) {
+		return new ApiResponse<>(true, "User created", userService.createUser(dto));
 	}
 
+	//GET ALL USERS
 	@GetMapping("/get")
-	public List<User> getAllUsers() {
-		return userService.getAllUsers();
+	public ApiResponse<List<UserResponseDTO>> getAllUsers() {
+		return new ApiResponse<>(true, "All users", userService.getAllUsers());
 	}
 
-	@GetMapping("get/{id}")
-	public User getUserById(@PathVariable Integer id) {
-		return userService.getUserById(id);
+	// GET USER BY ID
+	@GetMapping("/{id}")
+	public ApiResponse<UserResponseDTO> getUser(@PathVariable Integer id) {
+		return new ApiResponse<>(true, "User found", userService.getUserById(id));
 	}
 }

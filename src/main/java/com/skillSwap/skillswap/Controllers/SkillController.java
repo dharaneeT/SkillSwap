@@ -1,6 +1,8 @@
 package com.skillSwap.skillswap.Controllers;
 
-import com.skillSwap.skillswap.Entity.Skill;
+import com.skillSwap.skillswap.Dto.response.ApiResponse;
+import com.skillSwap.skillswap.Dto.skill.SkillRequestDTO;
+import com.skillSwap.skillswap.Dto.skill.SkillResponseDTO;
 import com.skillSwap.skillswap.Service.SkillService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +19,20 @@ public class SkillController {
 		this.skillService = skillService;
 	}
 
+	//ADD SKILL
 	@PostMapping("/add")
-	public Skill addSkill(@RequestBody Skill skill) {
-		return skillService.addSkill(skill);
+	public ApiResponse<SkillResponseDTO> addSkill(@RequestBody SkillRequestDTO dto) {
+		return new ApiResponse<>(true, "Skill Added", skillService.addSkill(dto));
 	}
 
+	//GET ALL SKILL
 	@GetMapping("/getskill")
-	public List<Skill> getAllSkill() {
-		return skillService.getAllSkills();
+	public ApiResponse<List<SkillResponseDTO>> getAllSkill() {
+		return new ApiResponse<>(true, "All Skills returned", skillService.getAllSkill());
 	}
-
-	@GetMapping("/getskill/{id}")
-	public Skill getSkillById(@PathVariable Integer id) {
-		return skillService.getSkillById(id);
-	}
+	//	//GET SKILL BY ID
+	//	@GetMapping("/getskill/{id}")
+	//	public ApiResponse<SkillResponseDTO> getSkillById(@PathVariable Integer id) {
+	//		return new ApiResponse<>(true, "Skill Returned", skillService.getSkillById(id));
+	//	}
 }
