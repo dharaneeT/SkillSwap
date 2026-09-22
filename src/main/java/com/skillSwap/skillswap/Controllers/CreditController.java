@@ -2,6 +2,8 @@ package com.skillSwap.skillswap.Controllers;
 
 import com.skillSwap.skillswap.Dto.response.ApiResponse;
 import com.skillSwap.skillswap.Service.CreditService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,9 +18,12 @@ public class CreditController {
 
 	// ADD CREDITS
 	@PostMapping("/{userId}")
-	public ApiResponse<String> addCredits(@PathVariable Integer userId, @RequestParam Integer credits) {
+	public ResponseEntity<ApiResponse<String>> addCredits(
+		@PathVariable Integer userId,
+		@Valid @RequestParam Integer credits
+	) {
 		creditService.addCredits(userId, credits);
 
-		return new ApiResponse<>(true, "Credits added", "Done");
+		return ResponseEntity.ok(new ApiResponse<>(true, "Credits added", "Success"));
 	}
 }

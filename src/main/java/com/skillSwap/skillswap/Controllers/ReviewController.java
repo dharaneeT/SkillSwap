@@ -5,7 +5,10 @@ import com.skillSwap.skillswap.Dto.review.ReviewRequestDTO;
 import com.skillSwap.skillswap.Dto.review.ReviewResponseDTO;
 import com.skillSwap.skillswap.Entity.Review;
 import com.skillSwap.skillswap.Service.ReviewService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +23,9 @@ public class ReviewController {
 	}
 
 	@PostMapping("/add")
-	public ApiResponse<ReviewResponseDTO> addReview(@RequestBody ReviewRequestDTO dto) {
-		return new ApiResponse<>(true, "Review Added", reviewService.addReview(dto));
+	public ResponseEntity<ApiResponse<ReviewResponseDTO>> addReview(@Valid @RequestBody ReviewRequestDTO dto) {
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
+			.body(new ApiResponse<>(true, "Review added", reviewService.addReview(dto)));
 	}
 }

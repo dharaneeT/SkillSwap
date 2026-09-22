@@ -1,8 +1,11 @@
 package com.skillSwap.skillswap.Service;
 
+import com.skillSwap.skillswap.Dto.user.UserProfileDTO;
 import com.skillSwap.skillswap.Dto.user.UserRequestDTO;
 import com.skillSwap.skillswap.Dto.user.UserResponseDTO;
+import com.skillSwap.skillswap.Entity.SkillType;
 import com.skillSwap.skillswap.Entity.User;
+import com.skillSwap.skillswap.Exception.UserNotFoundException;
 import com.skillSwap.skillswap.Repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +27,7 @@ public class UserService {
 	@Autowired
 	private final ModelMapper modelMapper;
 
-	//create user
+	//CREATE USERS
 	public UserResponseDTO createUser(UserRequestDTO dto) {
 		User user = modelMapper.map(dto, User.class);
 		user.setCredits(10);
@@ -32,7 +35,7 @@ public class UserService {
 		return modelMapper.map(saved, UserResponseDTO.class);
 	}
 
-	//get all users
+	//GET ALL USERS
 	public List<UserResponseDTO> getAllUsers() {
 		return userRepository
 			.findAll()
@@ -41,15 +44,48 @@ public class UserService {
 			.collect(Collectors.toList());
 	}
 
-	//get user by Id
+	//GET USER BY ID
 	public UserResponseDTO getUserById(Integer id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not Found"));
+		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not Found"));
 		return modelMapper.map(user, UserResponseDTO.class);
 	}
 
 	// INTERNAL ENTITY ACCESS (FOR OTHER SERVICES) //AI
 	public User getUserEntityById(Integer id) {
-		return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+		return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+	}
+
+	//FULL PROFILE OF THE  USER
+	public UserProfileDTO getUserProfile(Integer userId) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+		UserProfileDTO dto = new UserProfileDTO();
+
+		dto.setId(user.getId());
+		dto.setName(user.getName());
+		dto.setEmail(user.getEmail());
+		dto.setCredits(user.getCredits());
+
+		// OFFERED SKILLS
+		List<String> offered = user
+			.getSkills()
+			.stream()
+			.filter(us -> us.getType() == SkillType.OFFERED)
+			.map(us -> us.getSkill().getName())
+			.toList();
+
+		// WANTED SKILLS
+		List<String> wanted = user
+			.getSkills()
+			.stream()
+			.filter(us -> us.getType() == SkillType.WANTED)
+			.map(us -> us.getSkill().getName())
+			.toList();
+
+		dto.setOfferedSkills(offered);
+		dto.setWantedSkills(wanted);
+
+		return dto;
 	}
 	//            .
 	//            .

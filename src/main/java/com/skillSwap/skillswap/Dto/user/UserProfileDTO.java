@@ -11,6 +11,7 @@ public class UserProfileDTO {
 	private Integer id;
 	private String name;
 	private Integer credits;
+	private String email;
 
 	private List<String> offeredSkills;
 	private List<String> wantedSkills;
