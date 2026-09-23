@@ -11,4 +11,5 @@ import java.util.List;
 public interface SkillRepository extends JpaRepository<Skill, Integer> {
     @Query("SELECT s FROM Skill s WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     List<Skill> searchSkill(String name);
+
 }

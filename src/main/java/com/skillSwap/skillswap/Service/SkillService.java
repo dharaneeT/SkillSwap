@@ -50,6 +50,7 @@ public class SkillService {
 	public Skill getSkillEntityById(Integer id) {
 		return skillRepository.findById(id).orElseThrow(() -> new RuntimeException("Skill not found"));
 	}
+
 	//	public Skill addSkill(Skill skill) {
 	//		return skillRepository.save(skill);
 	//	}
@@ -58,9 +59,10 @@ public class SkillService {
 	//		return skillRepository.findAll();
 	//	}
 	//
-	//	public Skill getSkillById(Integer id) {
-	//		return skillRepository.findById(id).orElseThrow(() -> new RuntimeException("Skill Not Found"));
-	//	}
+	public SkillResponseDTO getSkillById(Integer id) {
+		Skill skill = skillRepository.findById(id).orElseThrow(() -> new RuntimeException("Skill not found"));
+		return modelMapper.map(skill, SkillResponseDTO.class);
+	}
 	//	public String deleteSkill(int id) {
 	//		skillRepository.deleteById(id);
 	//		return "Skill Deleted Succesfully";

@@ -54,6 +54,27 @@ public class UserController {
 		}
 	}
 
+	//GET USER BY NAME
+	@GetMapping("/name/{name}")
+	public ResponseEntity<ApiResponse<?>> getUserByName(@PathVariable String name) {
+		try {
+			UserResponseDTO user = userService.getUserByName(name);
+			return ResponseEntity.ok(new ApiResponse<>(true, "User Fetched", user));
+		} catch (UserNotFoundException ex) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, ex.getMessage(), null));
+		} catch (Exception ex) {
+			return ResponseEntity
+				.status(HttpStatus.INTERNAL_SERVER_ERROR)
+				.body(new ApiResponse<>(false, "Something went wrong", null));
+		}
+	}
+
+	//	@GetMapping("/{name}")
+	//	public ResponseEntity<ApiResponse<?>> getUserByName(@PathVariable String name) {
+	//		UserResponseDTO user = userService.getUserByName(name);
+	//		return ResponseEntity.ok(new ApiResponse<>(true, "User Fetched", user));
+	//	}
+
 	//PROFILE
 	@GetMapping("/profile/{id}")
 	public ResponseEntity<ApiResponse<UserProfileDTO>> getProfile(@PathVariable Integer id) {

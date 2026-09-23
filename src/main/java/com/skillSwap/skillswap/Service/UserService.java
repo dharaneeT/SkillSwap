@@ -44,6 +44,12 @@ public class UserService {
 			.collect(Collectors.toList());
 	}
 
+	//GET USER BY NAME
+	public UserResponseDTO getUserByName(String name) {
+		User user = userRepository.findByName(name).orElseThrow(() -> new UserNotFoundException("User not Found"));
+		return modelMapper.map(user, UserResponseDTO.class);
+	}
+
 	//GET USER BY ID
 	public UserResponseDTO getUserById(Integer id) {
 		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not Found"));

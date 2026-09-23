@@ -35,9 +35,10 @@ public class SkillController {
 	public ResponseEntity<ApiResponse<List<SkillResponseDTO>>> getAllSkill() {
 		return ResponseEntity.ok(new ApiResponse<>(true, "All users", skillService.getAllSkill()));
 	}
-	//	//GET SKILL BY ID
-	//	@GetMapping("/getskill/{id}")
-	//	public ApiResponse<SkillResponseDTO> getSkillById(@PathVariable Integer id) {
-	//		return new ApiResponse<>(true, "Skill Returned", skillService.getSkillById(id));
-	//	}
+
+	//GET SKILL BY ID
+	@GetMapping("/getskill/{id}")
+	public ApiResponse<SkillResponseDTO> getSkillById(@PathVariable Integer id) {
+		return new ApiResponse<>(true, "Skill Returned", skillService.getSkillById(id));
+	}
 }

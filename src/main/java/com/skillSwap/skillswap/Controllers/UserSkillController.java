@@ -5,6 +5,7 @@ import com.skillSwap.skillswap.Dto.userskill.UserSkillRequestDTO;
 import com.skillSwap.skillswap.Dto.userskill.UserSkillResponseDTO;
 import com.skillSwap.skillswap.Service.UserSkillService;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +27,16 @@ public class UserSkillController {
 		UserSkillResponseDTO data = userSkillService.addUserSkill(dto);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "User Skill added", data));
+	}
+
+	@GetMapping("/get")
+	public ResponseEntity<ApiResponse<List<UserSkillResponseDTO>>> getUserSkill() {
+		return ResponseEntity.ok(new ApiResponse<>(true, "All user Skills", userSkillService.getUserSkill()));
+	}
+
+	//GET USER_SKILL BY ID
+	@GetMapping("get/{id}")
+	public ResponseEntity<ApiResponse<UserSkillResponseDTO>> getUsById(@Valid @PathVariable Integer id) {
+		return ResponseEntity.ok(new ApiResponse<>(true, "User_Skill Returned", userSkillService.getUserSkillById(id)));
 	}
 }

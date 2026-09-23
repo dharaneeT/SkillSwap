@@ -5,7 +5,11 @@ import com.skillSwap.skillswap.Dto.userskill.UserSkillResponseDTO;
 import com.skillSwap.skillswap.Entity.Skill;
 import com.skillSwap.skillswap.Entity.User;
 import com.skillSwap.skillswap.Entity.UserSkill;
+import com.skillSwap.skillswap.Exception.UserSkillException;
 import com.skillSwap.skillswap.Repository.UserSkillRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,17 +21,21 @@ public class UserSkillService {
 
 	private final UserService userService;
 	private final SkillService skillService;
+	private final ModelMapper modelMapper;
 
 	public UserSkillService(
-		SkillService skillService,
+		UserSkillRepository userSkillRepository,
 		UserService userService,
-		UserSkillRepository userSkillRepository
+		SkillService skillService,
+		ModelMapper modelMapper
 	) {
-		this.skillService = skillService;
-		this.userService = userService;
 		this.userSkillRepository = userSkillRepository;
+		this.userService = userService;
+		this.skillService = skillService;
+		this.modelMapper = modelMapper;
 	}
 
+	//ADDING USER_SKILL
 	public UserSkillResponseDTO addUserSkill(UserSkillRequestDTO dto) {
 		User user = userService.getUserEntityById(dto.getUserId());
 		Skill skill = skillService.getSkillEntityById(dto.getSkillId());
@@ -46,5 +54,29 @@ public class UserSkillService {
 		response.setType(saved.getType());
 
 		return response;
+	}
+
+	//GET USER SKILL
+	public List<UserSkillResponseDTO> getUserSkill() {
+		return userSkillRepository
+			.findAll()
+			.stream()
+			.map(us -> {
+				UserSkillResponseDTO dto = new UserSkillResponseDTO();
+				dto.setId(us.getId());
+				dto.setUserName(us.getUser().getName());
+				dto.setSkillName(us.getSkill().getName());
+				dto.setType(us.getType());
+				return dto;
+			})
+			.collect(Collectors.toList());
+	}
+
+	//GET USER_SKILL BY ID
+	public UserSkillResponseDTO getUserSkillById(Integer id) {
+		UserSkill us = userSkillRepository
+			.findById(id)
+			.orElseThrow(() -> new UserSkillException("User_Skill is Not Found"));
+		return modelMapper.map(us, UserSkillResponseDTO.class);
 	}
 }
