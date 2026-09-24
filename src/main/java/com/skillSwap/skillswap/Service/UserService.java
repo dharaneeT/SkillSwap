@@ -11,16 +11,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-
-	public UserService(UserRepository userRepository, ModelMapper modelMapper) {
-		this.userRepository = userRepository;
-		this.modelMapper = modelMapper;
-	}
 
 	//	@Autowired
 	private final UserRepository userRepository;
@@ -28,11 +23,20 @@ public class UserService {
 	//	@Autowired
 	private final ModelMapper modelMapper;
 
+	private final PasswordEncoder passwordEncoder;
+
+	public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
+		this.userRepository = userRepository;
+		this.modelMapper = modelMapper;
+		this.passwordEncoder = passwordEncoder;
+	}
+
 	//CREATE USERS
 	@Operation(summary = "Create a new user")
 	public UserResponseDTO createUser(UserRequestDTO dto) {
 		User user = modelMapper.map(dto, User.class);
 		user.setCredits(10);
+		user.setPassword(passwordEncoder.encode(dto.getPassword()));
 		User saved = userRepository.save(user);
 		return modelMapper.map(saved, UserResponseDTO.class);
 	}
