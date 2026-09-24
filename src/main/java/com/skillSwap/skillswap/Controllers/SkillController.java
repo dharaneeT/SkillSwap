@@ -4,6 +4,7 @@ import com.skillSwap.skillswap.Dto.response.ApiResponse;
 import com.skillSwap.skillswap.Dto.skill.SkillRequestDTO;
 import com.skillSwap.skillswap.Dto.skill.SkillResponseDTO;
 import com.skillSwap.skillswap.Service.SkillService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/skillswap/v1/skill")
+@Tag(name = "Skill API", description = "Skill management APIs")
 public class SkillController {
 
 	@Autowired

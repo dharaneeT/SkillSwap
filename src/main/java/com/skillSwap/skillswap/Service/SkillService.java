@@ -4,6 +4,7 @@ import com.skillSwap.skillswap.Dto.skill.SkillRequestDTO;
 import com.skillSwap.skillswap.Dto.skill.SkillResponseDTO;
 import com.skillSwap.skillswap.Entity.Skill;
 import com.skillSwap.skillswap.Repository.SkillRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SkillService {
 
-	@Autowired
+	//	@Autowired
 	private SkillRepository skillRepository;
 
 	public SkillService(SkillRepository skillRepository, ModelMapper modelMapper) {
@@ -21,11 +22,11 @@ public class SkillService {
 		this.modelMapper = modelMapper;
 	}
 
-	@Autowired
+	//	@Autowired
 	private ModelMapper modelMapper;
 
 	//CREATE A SKILL
-
+	@Operation(summary = "CREATE NEW SKILL ")
 	public SkillResponseDTO addSkill(SkillRequestDTO dto) {
 		Skill skill = modelMapper.map(dto, Skill.class);
 		Skill saved = skillRepository.save(skill);
@@ -33,6 +34,7 @@ public class SkillService {
 	}
 
 	//GET ALL SKILLS
+	@Operation(summary = "GET ALL SKILLS")
 	public List<SkillResponseDTO> getAllSkill() {
 		return skillRepository
 			.findAll()
@@ -47,6 +49,7 @@ public class SkillService {
 	//	}
 
 	//INTERNAL METHOD
+	@Operation(summary = "GET ENTITY SKILL BY ID")
 	public Skill getSkillEntityById(Integer id) {
 		return skillRepository.findById(id).orElseThrow(() -> new RuntimeException("Skill not found"));
 	}
@@ -59,6 +62,8 @@ public class SkillService {
 	//		return skillRepository.findAll();
 	//	}
 	//
+
+	@Operation(summary = "GET SKILL BY ID")
 	public SkillResponseDTO getSkillById(Integer id) {
 		Skill skill = skillRepository.findById(id).orElseThrow(() -> new RuntimeException("Skill not found"));
 		return modelMapper.map(skill, SkillResponseDTO.class);

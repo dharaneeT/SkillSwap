@@ -5,6 +5,7 @@ import com.skillSwap.skillswap.Dto.session.SessionActionDTO;
 import com.skillSwap.skillswap.Dto.session.SessionRequestDTO;
 import com.skillSwap.skillswap.Dto.session.SessionResponseDTO;
 import com.skillSwap.skillswap.Service.SessionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/skillswap/v1/session")
+@Tag(name = "Session API", description = "Session management APIs")
 public class SessionController {
 
 	@Autowired

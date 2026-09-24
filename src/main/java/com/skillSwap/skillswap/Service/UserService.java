@@ -7,6 +7,7 @@ import com.skillSwap.skillswap.Entity.SkillType;
 import com.skillSwap.skillswap.Entity.User;
 import com.skillSwap.skillswap.Exception.UserNotFoundException;
 import com.skillSwap.skillswap.Repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
@@ -21,13 +22,14 @@ public class UserService {
 		this.modelMapper = modelMapper;
 	}
 
-	@Autowired
+	//	@Autowired
 	private final UserRepository userRepository;
 
-	@Autowired
+	//	@Autowired
 	private final ModelMapper modelMapper;
 
 	//CREATE USERS
+	@Operation(summary = "Create a new user")
 	public UserResponseDTO createUser(UserRequestDTO dto) {
 		User user = modelMapper.map(dto, User.class);
 		user.setCredits(10);
@@ -36,6 +38,7 @@ public class UserService {
 	}
 
 	//GET ALL USERS
+	@Operation(summary = "Get All users")
 	public List<UserResponseDTO> getAllUsers() {
 		return userRepository
 			.findAll()
@@ -45,23 +48,27 @@ public class UserService {
 	}
 
 	//GET USER BY NAME
+	@Operation(summary = "Get User by Name")
 	public UserResponseDTO getUserByName(String name) {
 		User user = userRepository.findByName(name).orElseThrow(() -> new UserNotFoundException("User not Found"));
 		return modelMapper.map(user, UserResponseDTO.class);
 	}
 
 	//GET USER BY ID
+	@Operation(summary = "GET USER BY ID")
 	public UserResponseDTO getUserById(Integer id) {
 		User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not Found"));
 		return modelMapper.map(user, UserResponseDTO.class);
 	}
 
 	// INTERNAL ENTITY ACCESS (FOR OTHER SERVICES) //AI
+	@Operation(summary = "GET ENTITY USER BY ID")
 	public User getUserEntityById(Integer id) {
 		return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
 	}
 
 	//FULL PROFILE OF THE  USER
+	@Operation(summary = "GET PROFILE OF THE USER")
 	public UserProfileDTO getUserProfile(Integer userId) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 

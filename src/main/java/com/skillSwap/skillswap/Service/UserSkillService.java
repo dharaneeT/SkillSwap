@@ -7,6 +7,7 @@ import com.skillSwap.skillswap.Entity.User;
 import com.skillSwap.skillswap.Entity.UserSkill;
 import com.skillSwap.skillswap.Exception.UserSkillException;
 import com.skillSwap.skillswap.Repository.UserSkillRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserSkillService {
 
-	@Autowired
+	//	@Autowired
 	private final UserSkillRepository userSkillRepository;
 
 	private final UserService userService;
@@ -36,6 +37,7 @@ public class UserSkillService {
 	}
 
 	//ADDING USER_SKILL
+	@Operation(summary = "ADDING A USER_SKILL")
 	public UserSkillResponseDTO addUserSkill(UserSkillRequestDTO dto) {
 		User user = userService.getUserEntityById(dto.getUserId());
 		Skill skill = skillService.getSkillEntityById(dto.getSkillId());
@@ -57,6 +59,7 @@ public class UserSkillService {
 	}
 
 	//GET USER SKILL
+	@Operation(summary = "GET USER_SKILL")
 	public List<UserSkillResponseDTO> getUserSkill() {
 		return userSkillRepository
 			.findAll()
@@ -73,6 +76,7 @@ public class UserSkillService {
 	}
 
 	//GET USER_SKILL BY ID
+	@Operation(summary = "GET USER_SKILL BY ID")
 	public UserSkillResponseDTO getUserSkillById(Integer id) {
 		UserSkill us = userSkillRepository
 			.findById(id)
