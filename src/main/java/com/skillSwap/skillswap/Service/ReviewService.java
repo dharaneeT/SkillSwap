@@ -6,6 +6,7 @@ import com.skillSwap.skillswap.Entity.Review;
 import com.skillSwap.skillswap.Entity.Session;
 import com.skillSwap.skillswap.Repository.ReviewRepository;
 import com.skillSwap.skillswap.Repository.SessionRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReviewService {
 
-	@Autowired
+	//	@Autowired
 	private ReviewRepository reviewRepository;
 
-	@Autowired
+	//	@Autowired
 	private SessionRepository sessionRepository;
 
-	@Autowired
+	//	@Autowired
 	private ModelMapper modelMapper;
 
 	public ReviewService(
@@ -33,6 +34,7 @@ public class ReviewService {
 	}
 
 	//Add Review
+	@Operation(summary = "ADD A NEW REVIEW")
 	public ReviewResponseDTO addReview(ReviewRequestDTO dto) {
 		Session session = sessionRepository
 			.findById(dto.getSessionId())

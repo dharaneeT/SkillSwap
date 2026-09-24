@@ -2,6 +2,7 @@ package com.skillSwap.skillswap.Service;
 
 import com.skillSwap.skillswap.Entity.User;
 import com.skillSwap.skillswap.Repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ public class CreditService {
 		this.userRepository = userRepository;
 	}
 
+	@Operation(summary = "ADD CREDITS")
 	public void addCredits(Integer userId, Integer credits) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 

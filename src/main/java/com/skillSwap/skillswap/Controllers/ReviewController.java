@@ -5,6 +5,7 @@ import com.skillSwap.skillswap.Dto.review.ReviewRequestDTO;
 import com.skillSwap.skillswap.Dto.review.ReviewResponseDTO;
 import com.skillSwap.skillswap.Entity.Review;
 import com.skillSwap.skillswap.Service.ReviewService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/skillswap/v1/review")
+@Tag(name = "Review API", description = "Review management APIs")
 public class ReviewController {
 
 	@Autowired

@@ -8,6 +8,7 @@ import com.skillSwap.skillswap.Entity.SessionStatus;
 import com.skillSwap.skillswap.Entity.Skill;
 import com.skillSwap.skillswap.Entity.User;
 import com.skillSwap.skillswap.Repository.SessionRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,10 @@ public class SessionService {
 	@Autowired
 	private UserService userService;
 
-	@Autowired
+	//	@Autowired
 	private SkillService skillService;
 
-	@Autowired
+	//	@Autowired
 	private ModelMapper modelMapper;
 
 	public SessionService(
@@ -40,6 +41,7 @@ public class SessionService {
 	}
 
 	//Book Session
+	@Operation(summary = "BOOK A SESSION")
 	public SessionResponseDTO bookSession(SessionRequestDTO dto) {
 		User provider = userService.getUserEntityById(dto.getProviderId());
 		User learner = userService.getUserEntityById(dto.getLearnerId());
@@ -62,6 +64,7 @@ public class SessionService {
 	}
 
 	//update session
+	@Operation(summary = "UPDATE SESSION")
 	public SessionResponseDTO updateSession(Integer sessionId, SessionActionDTO dto) {
 		Session session = sessionRepository
 			.findById(sessionId)

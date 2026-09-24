@@ -3,6 +3,7 @@ package com.skillSwap.skillswap.Controllers;
 import com.skillSwap.skillswap.Dto.Match.MatchResponseDTO;
 import com.skillSwap.skillswap.Dto.response.ApiResponse;
 import com.skillSwap.skillswap.Service.MatchService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/skillswap/v1/match")
+@Tag(name = "Skill_Match API", description = "Skill_Match management APIs")
 public class SkillMatchController {
 
 	@Autowired
