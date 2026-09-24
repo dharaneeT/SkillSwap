@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class User {
 
 	@Id
@@ -21,6 +20,9 @@ public class User {
 	private String name;
 	private String email;
 	private Integer credits;
+
+	@Column(nullable = false)
+	private String password;
 
 	@OneToMany(mappedBy = "user")
 	@JsonManagedReference

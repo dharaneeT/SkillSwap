@@ -19,4 +19,6 @@ public class UserRequestDTO {
 	@Email(message = "Invalid Email Format")
 	@Schema(example = "Dharanee@gmail.com")
 	private String email;
+
+	private String password;
 }
