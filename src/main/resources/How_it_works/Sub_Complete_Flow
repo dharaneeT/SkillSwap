@@ -1,0 +1,70 @@
+                         ┌──────────────┐
+                         │   Client     │
+                         │ Postman/Web  │
+                         └──────┬───────┘
+                                │
+                         Login email/password
+                                │
+                                ▼
+                       ┌─────────────────┐
+                       │ AuthController  │
+                       └────────┬────────┘
+                                │
+                                ▼
+                    ┌──────────────────────┐
+                    │ AuthenticationManager│
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │ UserDetailsService    │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                         ┌───────────┐
+                         │  MySQL    │
+                         │   User    │
+                         └─────┬─────┘
+                               │
+                               ▼
+                       PasswordEncoder
+                               │
+                         password OK
+                               │
+                               ▼
+                         ┌───────────┐
+                         │ JwtService│
+                         └─────┬─────┘
+                               │
+                               ▼
+                             JWT
+                               │
+                               ▼
+                            Client
+                               │
+              Authorization: Bearer JWT
+                               │
+                               ▼
+                      ┌────────────────┐
+                      │ JwtAuthFilter  │
+                      └───────┬────────┘
+                              │
+                       verify JWT
+                              │
+                              ▼
+                     SecurityContext
+                              │
+                              ▼
+                     Authorization
+                              │
+                              ▼
+                         Controller
+                              │
+                              ▼
+                           Service
+                              │
+                              ▼
+                         Repository
+                              │
+                              ▼
+                           MySQL
