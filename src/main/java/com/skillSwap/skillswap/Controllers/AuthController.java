@@ -27,9 +27,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequestDTO request) {
 
+        //AuthenticationManager:
+        //
+        //"Spring Security, please verify:
+        //
+        //username = test@gmail.com
+        //password = 1234"
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
+                        request.getEmail(),//authenticationManager go for CustomUserDetailService
                         request.getPassword()
                 )
         );

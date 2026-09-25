@@ -1,35 +1,50 @@
 package com.skillSwap.skillswap.Security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import javax.crypto.SecretKey;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
 
 @Service
 public class JwtService {
 
-    private final String SECRET = "skillswap-secret";
+	private static final String SECRET = "Be yourself; everyone else is taken";
+	private final SecretKey secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
-                .signWith(SignatureAlgorithm.HS256, SECRET)
-                .compact();
-    }
+	//Generating Token
+	public String generateToken(String username) {
+		return Jwts
+			.builder()
+			.subject(username) //setting the payload
+			.issuedAt(new Date())
+			.expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+			.signWith(secretKey)
+			.compact();
+		//  "sub": "test@gmail.com", //Subject
+		//  "iat": 1790317164,  //iat=Issued At
+		//  "exp": 1790320764   //Expired At
+	}
 
-    public String extractUsername(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
+	//
+	public String extractUsername(String token) {
+		Claims claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
 
-    public boolean validateToken(String token, UserDetails userDetails) {
-        return extractUsername(token).equals(userDetails.getUsername());
-    }
+		return claims.getSubject();
+	}
+
+	public boolean validateToken(String token, UserDetails userDetails) {
+		try {
+			Claims claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+
+			String username = claims.getSubject();
+
+			return username.equals(userDetails.getUsername()) && claims.getExpiration().after(new Date());
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }
