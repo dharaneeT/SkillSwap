@@ -17,7 +17,7 @@ public class JwtService {
 
 	//Generating Token
 	public String generateToken(String username) {
-		return Jwts
+		return Jwts //Jwts is a class
 			.builder()
 			.subject(username) //setting the payload
 			.issuedAt(new Date())
@@ -33,7 +33,7 @@ public class JwtService {
 	public String extractUsername(String token) {
 		Claims claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
 
-		return claims.getSubject();
+		return claims.getSubject(); //the subject is username AKA email in this instance
 	}
 
 	public boolean validateToken(String token, UserDetails userDetails) {

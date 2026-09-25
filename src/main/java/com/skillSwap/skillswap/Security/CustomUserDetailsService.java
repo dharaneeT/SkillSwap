@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String email) {
 		User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-		return new org.springframework.security.core.userdetails.User(
+		return new org.springframework.security.core.userdetails.User(//this User class implements UserDetails
 			user.getEmail(),
 			user.getPassword(), // IMPORTANT: must be encoded
 			new ArrayList<>()

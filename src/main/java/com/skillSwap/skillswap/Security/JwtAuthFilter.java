@@ -27,25 +27,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		throws ServletException, IOException {
 		String header = request.getHeader("Authorization");
 
-        //  Authorization header missing
-        //       ↓
-        //JwtAuthFilter does nothing
-        //       ↓
-        //continue
-        //       ↓
-        //Spring Security sees endpoint requires authentication
-        //       ↓
-        //401 Unauthorized
+		//  Authorization header missing
+		//       ↓
+		//JwtAuthFilter does nothing
+		//       ↓
+		//continue
+		//       ↓
+		//Spring Security sees endpoint requires authentication
+		//       ↓
+		//401 Unauthorized
 
 		if (header == null || !header.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
-        //if Token exist
+		//if Token exist
 		String token = header.substring(7); //beacuse the word "Bearer has 7 char"
-		String username = jwtService.extractUsername(token);//extract username
+		String username = jwtService.extractUsername(token); //extract username
 
+		//Check user is already validated, so we don't have to validate again
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails user = userDetailsService.loadUserByUsername(username);
 
