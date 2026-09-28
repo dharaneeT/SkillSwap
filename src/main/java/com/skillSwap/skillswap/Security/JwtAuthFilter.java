@@ -40,49 +40,52 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 		//       ↓
 		//401 Unauthorized
 
+		String path = request.getServletPath();
+		if (path.startsWith("/skillswap/v1/auth/")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 		if (header == null || !header.startsWith("Bearer ")) {
 			filterChain.doFilter(request, response);
 			return;
 		}
+		String token = header.substring(7);
+		try {
+			String username = jwtService.extractUsername(token);
+			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+				UserDetails user = userDetailsService.loadUserByUsername(username);
+				if (user.isEnabled() && jwtService.validateToken(token, user)) {
+					UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+						user,
+						null,
+						user.getAuthorities()
+					);
+					auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext().setAuthentication(auth);
+				}
+			}
+		} catch (JwtException | IllegalArgumentException | UsernameNotFoundException e) {
+			SecurityContextHolder.clearContext(); // invalid token → stay anonymous
+		}
 
-
-        String token = header.substring(7);
-        try {
-            String username = jwtService.extractUsername(token);
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails user = userDetailsService.loadUserByUsername(username);
-                if (user.isEnabled() && jwtService.validateToken(token, user)) {
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-            }
-        } catch (JwtException | IllegalArgumentException | UsernameNotFoundException e) {
-            SecurityContextHolder.clearContext();        // invalid token → stay anonymous
-        }
-
-
-
-
-//		//if Token exist
-//		String token = header.substring(7); //beacuse the word "Bearer has 7 char"
-//		String username = jwtService.extractUsername(token); //extract username
-//
-//		//Check user is already validated, so we don't have to validate again
-//		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-//			UserDetails user = userDetailsService.loadUserByUsername(username);
-//
-//			if (jwtService.validateToken(token, user)) {
-//				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-//					user,
-//					null,
-//					user.getAuthorities()
-//				);
-//
-//				SecurityContextHolder.getContext().setAuthentication(auth);
-//			}
-//		}
+		//		//if Token exist
+		//		String token = header.substring(7); //beacuse the word "Bearer has 7 char"
+		//		String username = jwtService.extractUsername(token); //extract username
+		//
+		//		//Check user is already validated, so we don't have to validate again
+		//		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+		//			UserDetails user = userDetailsService.loadUserByUsername(username);
+		//
+		//			if (jwtService.validateToken(token, user)) {
+		//				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+		//					user,
+		//					null,
+		//					user.getAuthorities()
+		//				);
+		//
+		//				SecurityContextHolder.getContext().setAuthentication(auth);
+		//			}
+		//		}
 
 		filterChain.doFilter(request, response);
 	}
