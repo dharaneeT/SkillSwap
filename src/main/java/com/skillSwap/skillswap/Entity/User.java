@@ -18,7 +18,10 @@ public class User {
 	private Integer id;
 
 	private String name;
+
+	@Column(nullable = false, unique = true)
 	private String email;
+
 	private Integer credits;
 
 	@Column(nullable = false)
@@ -27,4 +30,14 @@ public class User {
 	@OneToMany(mappedBy = "user")
 	@JsonManagedReference
 	private List<UserSkill> skills;
+
+	@Enumerated(EnumType.STRING)
+	private Role role = Role.USER; //Setting USER role as Default
+
+	private Boolean active = true;
+
+	// FOR MATCHING
+	private String city;
+	private Double latitude;
+	private Double longitude;
 }
