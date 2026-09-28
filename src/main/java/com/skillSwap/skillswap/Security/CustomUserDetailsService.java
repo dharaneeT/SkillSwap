@@ -1,8 +1,12 @@
 package com.skillSwap.skillswap.Security;
 
+import com.skillSwap.skillswap.Entity.Role;
 import com.skillSwap.skillswap.Entity.User;
 import com.skillSwap.skillswap.Repository.UserRepository;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -16,13 +20,17 @@ public class CustomUserDetailsService implements UserDetailsService {
 		this.userRepository = userRepository;
 	}
 
+
+
 	@Override
 	public UserDetails loadUserByUsername(String email) {
 		User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-		return new org.springframework.security.core.userdetails.User(//this User class implements UserDetails
-			user.getEmail(),
-			user.getPassword(), // IMPORTANT: must be encoded
-			new ArrayList<>()
-		);
+        Role role = user.getRole() == null ? Role.USER : user.getRole();
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .roles(role.name())
+                .disabled(Boolean.FALSE.equals(user.getActive()))
+                .build();
 	}
 }

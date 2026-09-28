@@ -2,10 +2,13 @@ package com.skillSwap.skillswap.Controllers;
 
 import com.skillSwap.skillswap.Dto.Auth.AuthRequestDTO;
 import com.skillSwap.skillswap.Dto.Auth.AuthResponseDTO;
-import com.skillSwap.skillswap.Security.JwtService;
+import com.skillSwap.skillswap.Dto.Auth.SignupRequestDTO;
+import com.skillSwap.skillswap.Dto.response.ApiResponse;
+import com.skillSwap.skillswap.Service.AuthService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,35 +16,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/skillswap/v1/auth")
+@Tag(name = "Auth API", description = "Signup and login")
 public class AuthController {
 
-    private final AuthenticationManager authManager;
-    private final JwtService jwtService;
+    private final AuthService authService;
 
-    public AuthController(AuthenticationManager authManager,
-                          JwtService jwtService) {
-        this.authManager = authManager;
-        this.jwtService = jwtService;
+    public AuthController(AuthService authService) { this.authService = authService; }
+
+    @PostMapping("/signup")
+    public ResponseEntity<ApiResponse<AuthResponseDTO>> signup(@Valid @RequestBody SignupRequestDTO req) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(true, "Signup successful", authService.signup(req)));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequestDTO request) {
-
-        //AuthenticationManager:
-        //
-        //"Spring Security, please verify:
-        //
-        //username = test@gmail.com
-        //password = 1234"
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),//authenticationManager go for CustomUserDetailService
-                        request.getPassword()
-                )
-        );
-
-        String token = jwtService.generateToken(request.getEmail());
-
-        return ResponseEntity.ok(new AuthResponseDTO(token));
+    public ResponseEntity<ApiResponse<AuthResponseDTO>> login(@Valid @RequestBody AuthRequestDTO req) {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Login successful", authService.login(req)));
     }
 }
