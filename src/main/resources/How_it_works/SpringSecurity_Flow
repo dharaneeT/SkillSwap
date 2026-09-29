@@ -1,0 +1,97 @@
+THE FULL FLOW
+
+HTTP REQUEST
+     │
+     ▼
+JwtAuthFilter
+     │
+     ├── No JWT ────────────────► Security rejects
+     │
+     ▼
+Extract JWT
+     │
+     ▼
+Verify signature
+     │
+     ▼
+Check expiration
+     │
+     ▼
+Extract email
+     │
+     ▼
+Load user
+     │
+     ▼
+Create Authentication
+     │
+     ▼
+SecurityContext
+     │
+     ▼
+Controller
+     │
+     ▼
+Service
+     │
+     ▼
+Repository
+     │
+     ▼
+MySQL
+//////////////////////////////////////////////////////
+LOGIN FLOW
+
+EMAIL + PASSWORD
+       │
+       ▼
+AuthController
+       │
+       ▼
+AuthenticationManager
+       │
+       ▼
+UserDetailsService
+       │
+       ▼
+MySQL
+       │
+       ▼
+PasswordEncoder
+       │
+       ▼
+Authentication SUCCESS
+       │
+       ▼
+JwtService
+       │
+       ▼
+JWT
+       │
+       ▼
+Client
+
+//////////////////////////////////////
+SUBSEQUENT REQUEST FLOW
+
+CLIENT
+   │
+   │ Authorization: Bearer JWT
+   ▼
+JwtAuthFilter
+   │
+   ▼
+JwtService
+   │
+   ├── signature valid?
+   ├── expired?
+   └── username?
+   │
+   ▼
+UserDetailsService
+   │
+   ▼
+SecurityContext
+   │
+   ▼
+Controller

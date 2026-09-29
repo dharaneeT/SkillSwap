@@ -1,0 +1,46 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+spring.datasource.username=root
+spring.datasource.password=dharanee123
+
+# 256-bit key, Base64. Generate with:  openssl rand -base64 32
+jwt.secret=Be yourself; everyone else is taken
+
+skillswap.admin.email=dharanee@gmail.com
+skillswap.admin.password=0929
+
+# From Mailtrap: Email Testing → Inboxes → your inbox → SMTP settings / Integration
+#spring.mail.username=YOUR_MAILTRAP_USERNAME
+#spring.mail.password=YOUR_MAILTRAP_PASSWORD
