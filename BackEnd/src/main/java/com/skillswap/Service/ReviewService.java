@@ -1,11 +1,11 @@
-package com.skillswap.Service;
+package com.skillSwap.Service;
 
-import com.skillswap.Dto.review.ReviewRequestDTO;
-import com.skillswap.Dto.review.ReviewResponseDTO;
-import com.skillswap.Entity.Review;
-import com.skillswap.Entity.Session;
-import com.skillswap.Repository.ReviewRepository;
-import com.skillswap.Repository.SessionRepository;
+import com.skillSwap.Dto.review.ReviewRequestDTO;
+import com.skillSwap.Dto.review.ReviewResponseDTO;
+import com.skillSwap.Entity.Review;
+import com.skillSwap.Entity.Session;
+import com.skillSwap.Repository.ReviewRepository;
+import com.skillSwap.Repository.SessionRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;

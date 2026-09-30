@@ -1,10 +1,10 @@
-package com.skillswap.Controllers;
+package com.skillSwap.Controllers;
 
-import com.skillswap.Dto.Auth.AuthRequestDTO;
-import com.skillswap.Dto.Auth.AuthResponseDTO;
-import com.skillswap.Dto.Auth.SignupRequestDTO;
-import com.skillswap.Dto.response.ApiResponse;
-import com.skillswap.Service.AuthService;
+import com.skillSwap.Dto.Auth.AuthRequestDTO;
+import com.skillSwap.Dto.Auth.AuthResponseDTO;
+import com.skillSwap.Dto.Auth.SignupRequestDTO;
+import com.skillSwap.Dto.response.ApiResponse;
+import com.skillSwap.Service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

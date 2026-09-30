@@ -1,7 +1,7 @@
-package com.skillswap.Service;
+package com.skillSwap.Service;
 
-import com.skillswap.Entity.User;
-import com.skillswap.Repository.UserRepository;
+import com.skillSwap.Entity.User;
+import com.skillSwap.Repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.stereotype.Service;
 

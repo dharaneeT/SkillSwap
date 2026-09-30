@@ -1,13 +1,13 @@
-package com.skillswap.Service;
+package com.skillSwap.Service;
 
-import com.skillswap.Dto.user.UserResponseDTO;
-import com.skillswap.Entity.Role;
-import com.skillswap.Entity.User;
-import com.skillswap.Exception.SkillNotFoundException;
-import com.skillswap.Exception.UserNotFoundException;
-import com.skillswap.Repository.SkillRepository;
-import com.skillswap.Repository.UserRepository;
-import com.skillswap.Security.CurrentUserService;
+import com.skillSwap.Dto.user.UserResponseDTO;
+import com.skillSwap.Entity.Role;
+import com.skillSwap.Entity.User;
+import com.skillSwap.Exception.SkillNotFoundException;
+import com.skillSwap.Exception.UserNotFoundException;
+import com.skillSwap.Repository.SkillRepository;
+import com.skillSwap.Repository.UserRepository;
+import com.skillSwap.Security.CurrentUserService;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.modelmapper.ModelMapper;

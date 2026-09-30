@@ -1,4 +1,4 @@
-package com.skillswap.config;
+package com.skillSwap.config;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;

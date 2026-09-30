@@ -1,9 +1,9 @@
-package com.skillswap.Service;
+package com.skillSwap.Service;
 
-import com.skillswap.Dto.Match.MatchResponseDTO;
-import com.skillswap.Entity.SkillType;
-import com.skillswap.Entity.UserSkill;
-import com.skillswap.Repository.UserSkillRepository;
+import com.skillSwap.Dto.Match.MatchResponseDTO;
+import com.skillSwap.Entity.SkillType;
+import com.skillSwap.Entity.UserSkill;
+import com.skillSwap.Repository.UserSkillRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import org.springframework.stereotype.Service;

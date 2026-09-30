@@ -1,4 +1,4 @@
-package com.skillswap.Dto.Match;
+package com.skillSwap.Dto.Match;
 
 import lombok.*;
 

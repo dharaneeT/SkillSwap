@@ -1,12 +1,12 @@
-package com.skillswap.Service;
+package com.skillSwap.Service;
 
-import com.skillswap.Dto.user.UserProfileDTO;
-import com.skillswap.Dto.user.UserRequestDTO;
-import com.skillswap.Dto.user.UserResponseDTO;
-import com.skillswap.Entity.SkillType;
-import com.skillswap.Entity.User;
-import com.skillswap.Exception.UserNotFoundException;
-import com.skillswap.Repository.UserRepository;
+import com.skillSwap.Dto.user.UserProfileDTO;
+import com.skillSwap.Dto.user.UserRequestDTO;
+import com.skillSwap.Dto.user.UserResponseDTO;
+import com.skillSwap.Entity.SkillType;
+import com.skillSwap.Entity.User;
+import com.skillSwap.Exception.UserNotFoundException;
+import com.skillSwap.Repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,15 +31,15 @@ public class UserService {
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	//CREATE USERS
-	@Operation(summary = "Create a new user")
-	public UserResponseDTO createUser(UserRequestDTO dto) {
-		User user = modelMapper.map(dto, User.class);
-		user.setCredits(10);
-		user.setPassword(passwordEncoder.encode(dto.getPassword()));
-		User saved = userRepository.save(user);
-		return modelMapper.map(saved, UserResponseDTO.class);
-	}
+	//	//CREATE USERS
+	//	@Operation(summary = "Create a new user")
+	//	public UserResponseDTO createUser(UserRequestDTO dto) {
+	//		User user = modelMapper.map(dto, User.class);
+	//		user.setCredits(10);
+	//		user.setPassword(passwordEncoder.encode(dto.getPassword()));
+	//		User saved = userRepository.save(user);
+	//		return modelMapper.map(saved, UserResponseDTO.class);
+	//	}
 
 	//GET ALL USERS
 	@Operation(summary = "Get All users")

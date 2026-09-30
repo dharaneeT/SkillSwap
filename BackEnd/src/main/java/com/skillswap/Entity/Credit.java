@@ -1,4 +1,4 @@
-package com.skillswap.Entity;
+package com.skillSwap.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;

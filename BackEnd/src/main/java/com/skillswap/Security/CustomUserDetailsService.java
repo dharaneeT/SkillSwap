@@ -1,8 +1,8 @@
-package com.skillswap.Security;
+package com.skillSwap.Security;
 
-import com.skillswap.Entity.Role;
-import com.skillswap.Entity.User;
-import com.skillswap.Repository.UserRepository;
+import com.skillSwap.Entity.Role;
+import com.skillSwap.Entity.User;
+import com.skillSwap.Repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;

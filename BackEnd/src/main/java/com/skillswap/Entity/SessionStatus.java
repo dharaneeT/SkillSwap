@@ -1,4 +1,4 @@
-package com.skillswap.Entity;
+package com.skillSwap.Entity;
 
 public enum SessionStatus {
 	PENDING,

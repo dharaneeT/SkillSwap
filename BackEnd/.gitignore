@@ -36,10 +36,10 @@ spring.datasource.username=root
 spring.datasource.password=dharanee123
 
 # 256-bit key, Base64. Generate with:  openssl rand -base64 32
-jwt.secret=Be yourself; everyone else is taken
+jwt.secret=nX1pZ0p3dW5kT2Z6QkJqY0FhR3pZc1FqV0ZxZk5Xc1h3bVd5c0RzV0RkRk5vPQ==
 
 skillswap.admin.email=dharanee@gmail.com
-skillswap.admin.password=0929
+skillswap.admin.password=9360162577
 
 # From Mailtrap: Email Testing → Inboxes → your inbox → SMTP settings / Integration
 #spring.mail.username=YOUR_MAILTRAP_USERNAME

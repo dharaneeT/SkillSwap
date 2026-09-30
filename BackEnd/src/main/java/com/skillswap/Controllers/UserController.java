@@ -1,10 +1,10 @@
-package com.skillswap.Controllers;
+package com.skillSwap.Controllers;
 
-import com.skillswap.Dto.response.ApiResponse;
-import com.skillswap.Dto.user.UserProfileDTO;
-import com.skillswap.Dto.user.UserResponseDTO;
-import com.skillswap.Exception.UserNotFoundException;
-import com.skillswap.Service.UserService;
+import com.skillSwap.Dto.response.ApiResponse;
+import com.skillSwap.Dto.user.UserProfileDTO;
+import com.skillSwap.Dto.user.UserResponseDTO;
+import com.skillSwap.Exception.UserNotFoundException;
+import com.skillSwap.Service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;

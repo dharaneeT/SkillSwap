@@ -1,4 +1,4 @@
-package com.skillswap.Dto.Auth;
+package com.skillSwap.Dto.Auth;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -13,6 +13,6 @@ public class SignupRequestDTO {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Size(min = 8, max = 72, message = "Password must be 8-72 characters")
     private String password;
 }

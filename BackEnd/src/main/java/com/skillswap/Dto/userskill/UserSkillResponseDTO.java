@@ -1,6 +1,6 @@
-package com.skillswap.Dto.userskill;
+package com.skillSwap.Dto.userskill;
 
-import com.skillswap.Entity.SkillType;
+import com.skillSwap.Entity.SkillType;
 import lombok.*;
 
 @Data

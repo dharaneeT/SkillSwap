@@ -1,9 +1,9 @@
-package com.skillswap.Controllers;
+package com.skillSwap.Controllers;
 
-import com.skillswap.Dto.response.ApiResponse;
-import com.skillswap.Dto.user.UserResponseDTO;
-import com.skillswap.Entity.Role;
-import com.skillswap.Service.AdminService;
+import com.skillSwap.Dto.response.ApiResponse;
+import com.skillSwap.Dto.user.UserResponseDTO;
+import com.skillSwap.Entity.Role;
+import com.skillSwap.Service.AdminService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.skillswap.Dto.user;
+package com.skillSwap.Dto.user;
 
 import java.util.List;
 import lombok.*;

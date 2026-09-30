@@ -1,4 +1,4 @@
-package com.skillswap.Dto.skill;
+package com.skillSwap.Dto.skill;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

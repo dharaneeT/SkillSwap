@@ -1,4 +1,4 @@
-package com.skillswap.Dto.user;
+package com.skillSwap.Dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

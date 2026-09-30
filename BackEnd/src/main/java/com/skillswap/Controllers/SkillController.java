@@ -1,9 +1,9 @@
-package com.skillswap.Controllers;
+package com.skillSwap.Controllers;
 
-import com.skillswap.Dto.response.ApiResponse;
-import com.skillswap.Dto.skill.SkillRequestDTO;
-import com.skillswap.Dto.skill.SkillResponseDTO;
-import com.skillswap.Service.SkillService;
+import com.skillSwap.Dto.response.ApiResponse;
+import com.skillSwap.Dto.skill.SkillRequestDTO;
+import com.skillSwap.Dto.skill.SkillResponseDTO;
+import com.skillSwap.Service.SkillService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -35,7 +35,7 @@ public class SkillController {
 	//GET ALL SKILL
 	@GetMapping("/getskill")
 	public ResponseEntity<ApiResponse<List<SkillResponseDTO>>> getAllSkill() {
-		return ResponseEntity.ok(new ApiResponse<>(true, "All users", skillService.getAllSkill()));
+		return ResponseEntity.ok(new ApiResponse<>(true, "All SKills", skillService.getAllSkill()));
 	}
 
 	//GET SKILL BY ID

@@ -1,7 +1,7 @@
-package com.skillswap.Repository;
+package com.skillSwap.Repository;
 
-import com.skillswap.Entity.Session;
-import com.skillswap.Entity.SessionStatus;
+import com.skillSwap.Entity.Session;
+import com.skillSwap.Entity.SessionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -1,8 +1,8 @@
-package com.skillswap.Security;
+package com.skillSwap.Security;
 
-import com.skillswap.Entity.User;
-import com.skillswap.Exception.UserNotFoundException;
-import com.skillswap.Repository.UserRepository;
+import com.skillSwap.Entity.User;
+import com.skillSwap.Exception.UserNotFoundException;
+import com.skillSwap.Repository.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -1,4 +1,4 @@
-package com.skillswap;
+package com.skillSwap;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

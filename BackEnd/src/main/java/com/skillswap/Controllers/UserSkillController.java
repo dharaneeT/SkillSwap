@@ -1,9 +1,9 @@
-package com.skillswap.Controllers;
+package com.skillSwap.Controllers;
 
-import com.skillswap.Dto.response.ApiResponse;
-import com.skillswap.Dto.userskill.UserSkillRequestDTO;
-import com.skillswap.Dto.userskill.UserSkillResponseDTO;
-import com.skillswap.Service.UserSkillService;
+import com.skillSwap.Dto.response.ApiResponse;
+import com.skillSwap.Dto.userskill.UserSkillRequestDTO;
+import com.skillSwap.Dto.userskill.UserSkillResponseDTO;
+import com.skillSwap.Service.UserSkillService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;

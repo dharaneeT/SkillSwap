@@ -1,6 +1,6 @@
-package com.skillswap.Dto.session;
+package com.skillSwap.Dto.session;
 
-import com.skillswap.Entity.SessionStatus;
+import com.skillSwap.Entity.SessionStatus;
 import java.time.LocalDateTime;
 import lombok.*;
 

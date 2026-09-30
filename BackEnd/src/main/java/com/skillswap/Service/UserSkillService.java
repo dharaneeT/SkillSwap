@@ -1,12 +1,12 @@
-package com.skillswap.Service;
+package com.skillSwap.Service;
 
-import com.skillswap.Dto.userskill.UserSkillRequestDTO;
-import com.skillswap.Dto.userskill.UserSkillResponseDTO;
-import com.skillswap.Entity.Skill;
-import com.skillswap.Entity.User;
-import com.skillswap.Entity.UserSkill;
-import com.skillswap.Exception.UserSkillException;
-import com.skillswap.Repository.UserSkillRepository;
+import com.skillSwap.Dto.userskill.UserSkillRequestDTO;
+import com.skillSwap.Dto.userskill.UserSkillResponseDTO;
+import com.skillSwap.Entity.Skill;
+import com.skillSwap.Entity.User;
+import com.skillSwap.Entity.UserSkill;
+import com.skillSwap.Exception.UserSkillException;
+import com.skillSwap.Repository.UserSkillRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.stream.Collectors;

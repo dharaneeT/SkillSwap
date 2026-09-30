@@ -1,4 +1,4 @@
-package com.skillswap.Security;
+package com.skillSwap.Security;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

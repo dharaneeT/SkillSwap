@@ -1,4 +1,4 @@
-package com.skillswap.Exception;
+package com.skillSwap.Exception;
 
 public class SkillNotFoundException extends ResourceNotFoundException {
 

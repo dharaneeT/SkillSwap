@@ -1,4 +1,4 @@
-package com.skillswap.Dto.errorResponse;
+package com.skillSwap.Dto.errorResponse;
 
 import lombok.*;
 

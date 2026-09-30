@@ -1,8 +1,8 @@
-package com.skillswap.Controllers;
+package com.skillSwap.Controllers;
 
-import com.skillswap.Dto.Match.MatchResponseDTO;
-import com.skillswap.Dto.response.ApiResponse;
-import com.skillswap.Service.MatchService;
+import com.skillSwap.Dto.Match.MatchResponseDTO;
+import com.skillSwap.Dto.response.ApiResponse;
+import com.skillSwap.Service.MatchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

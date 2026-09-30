@@ -1,9 +1,9 @@
-package com.skillswap.Service;
+package com.skillSwap.Service;
 
-import com.skillswap.Dto.skill.SkillRequestDTO;
-import com.skillswap.Dto.skill.SkillResponseDTO;
-import com.skillswap.Entity.Skill;
-import com.skillswap.Repository.SkillRepository;
+import com.skillSwap.Dto.skill.SkillRequestDTO;
+import com.skillSwap.Dto.skill.SkillResponseDTO;
+import com.skillSwap.Entity.Skill;
+import com.skillSwap.Repository.SkillRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.stream.Collectors;

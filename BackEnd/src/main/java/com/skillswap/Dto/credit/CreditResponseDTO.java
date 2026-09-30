@@ -1,4 +1,4 @@
-package com.skillswap.Dto.credit;
+package com.skillSwap.Dto.credit;
 
 import lombok.*;
 

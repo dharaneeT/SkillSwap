@@ -1,9 +1,9 @@
-package com.skillswap.Controllers;
+package com.skillSwap.Controllers;
 
-import com.skillswap.Dto.response.ApiResponse;
-import com.skillswap.Dto.review.ReviewRequestDTO;
-import com.skillswap.Dto.review.ReviewResponseDTO;
-import com.skillswap.Service.ReviewService;
+import com.skillSwap.Dto.response.ApiResponse;
+import com.skillSwap.Dto.review.ReviewRequestDTO;
+import com.skillSwap.Dto.review.ReviewResponseDTO;
+import com.skillSwap.Service.ReviewService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

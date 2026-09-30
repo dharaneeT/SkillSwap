@@ -1,4 +1,4 @@
-package com.skillswap.Dto.skill;
+package com.skillSwap.Dto.skill;
 
 import lombok.*;
 

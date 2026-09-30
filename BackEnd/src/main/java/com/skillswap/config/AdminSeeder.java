@@ -1,8 +1,8 @@
-package com.skillswap.config;
+package com.skillSwap.config;
 
-import com.skillswap.Entity.Role;
-import com.skillswap.Entity.User;
-import com.skillswap.Repository.UserRepository;
+import com.skillSwap.Entity.Role;
+import com.skillSwap.Entity.User;
+import com.skillSwap.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

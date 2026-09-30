@@ -1,8 +1,8 @@
-package com.skillswap.config;
+package com.skillSwap.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.skillswap.Dto.errorResponse.ErrorResponseDTO;
-import com.skillswap.Security.JwtAuthFilter;
+import com.skillSwap.Dto.errorResponse.ErrorResponseDTO;
+import com.skillSwap.Security.JwtAuthFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;

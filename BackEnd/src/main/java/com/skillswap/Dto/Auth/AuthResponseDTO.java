@@ -1,4 +1,4 @@
-package com.skillswap.Dto.Auth;
+package com.skillSwap.Dto.Auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

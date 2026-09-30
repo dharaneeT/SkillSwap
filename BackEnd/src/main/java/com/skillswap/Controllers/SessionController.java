@@ -1,10 +1,10 @@
-package com.skillswap.Controllers;
+package com.skillSwap.Controllers;
 
-import com.skillswap.Dto.response.ApiResponse;
-import com.skillswap.Dto.session.SessionActionDTO;
-import com.skillswap.Dto.session.SessionRequestDTO;
-import com.skillswap.Dto.session.SessionResponseDTO;
-import com.skillswap.Service.SessionService;
+import com.skillSwap.Dto.response.ApiResponse;
+import com.skillSwap.Dto.session.SessionActionDTO;
+import com.skillSwap.Dto.session.SessionRequestDTO;
+import com.skillSwap.Dto.session.SessionResponseDTO;
+import com.skillSwap.Service.SessionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class SessionController {
 
 	//booking session
 	@PostMapping("/book-session")
-	public ResponseEntity<ApiResponse<SessionResponseDTO>> bookSession(@RequestBody SessionRequestDTO dto) {
+	public ResponseEntity<ApiResponse<SessionResponseDTO>> bookSession(@Valid @RequestBody SessionRequestDTO dto) {
 		return ResponseEntity
 			.status(HttpStatus.OK)
 			.body(new ApiResponse<>(true, "Session Booked", sessionService.bookSession(dto)));

@@ -1,4 +1,4 @@
-package com.skillswap.Dto.review;
+package com.skillSwap.Dto.review;
 
 import lombok.*;
 

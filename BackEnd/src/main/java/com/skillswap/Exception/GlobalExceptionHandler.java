@@ -1,6 +1,6 @@
-package com.skillswap.Exception;
+package com.skillSwap.Exception;
 
-import com.skillswap.Dto.errorResponse.ErrorResponseDTO;
+import com.skillSwap.Dto.errorResponse.ErrorResponseDTO;
 import java.time.LocalDateTime;
 import org.springframework.http.*;
 import org.springframework.security.authentication.DisabledException;
@@ -15,6 +15,21 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(new ErrorResponseDTO(false, message, status.value(), LocalDateTime.now()), status);
 	}
 
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class) // race / DB unique
+    public ResponseEntity<ErrorResponseDTO> handleIntegrity(Exception ex) {
+        return build(HttpStatus.CONFLICT, "Operation violates a data constraint (e.g. email already exists)");
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)                  // AdminService throws this -> 400
+    public ResponseEntity<ErrorResponseDTO> handleIllegalArg(IllegalArgumentException ex) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)                                 // fallback, keep LAST
+    public ResponseEntity<ErrorResponseDTO> handleAny(Exception ex) {
+        ex.printStackTrace(); // or a logger
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
+    }
 	// wrong password / unknown email  → 401 (generic message: don't reveal which one was wrong)
 	@ExceptionHandler(AuthenticationException.class)
 	public ResponseEntity<ErrorResponseDTO> handleAuth(AuthenticationException ex) {

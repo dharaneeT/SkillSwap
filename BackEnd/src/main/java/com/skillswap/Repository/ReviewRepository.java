@@ -1,6 +1,6 @@
-package com.skillswap.Repository;
+package com.skillSwap.Repository;
 
-import com.skillswap.Entity.Review;
+import com.skillSwap.Entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

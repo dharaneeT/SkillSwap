@@ -1,13 +1,13 @@
-package com.skillswap.Service;
+package com.skillSwap.Service;
 
-import com.skillswap.Dto.Auth.AuthRequestDTO;
-import com.skillswap.Dto.Auth.AuthResponseDTO;
-import com.skillswap.Dto.Auth.SignupRequestDTO;
-import com.skillswap.Entity.Role;
-import com.skillswap.Entity.User;
-import com.skillswap.Exception.DuplicateResourceException;
-import com.skillswap.Repository.UserRepository;
-import com.skillswap.Security.JwtService;
+import com.skillSwap.Dto.Auth.AuthRequestDTO;
+import com.skillSwap.Dto.Auth.AuthResponseDTO;
+import com.skillSwap.Dto.Auth.SignupRequestDTO;
+import com.skillSwap.Entity.Role;
+import com.skillSwap.Entity.User;
+import com.skillSwap.Exception.DuplicateResourceException;
+import com.skillSwap.Repository.UserRepository;
+import com.skillSwap.Security.JwtService;
 import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,7 +42,7 @@ public class AuthService {
 
 	@Transactional
 	public AuthResponseDTO signup(SignupRequestDTO req) {
-		String email = req.getEmail().trim();
+		String email = req.getEmail().trim().toLowerCase();
 		if (userRepository.existsByEmail(email)) {
 			throw new DuplicateResourceException("Email is already registered");
 		}
