@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/skillswap/v1/session")
 @Tag(name = "Session API", description = "Session management APIs")
@@ -42,4 +44,10 @@ public class SessionController {
 			.status(HttpStatus.ACCEPTED)
 			.body(new ApiResponse<>(true, "Session Updated", sessionService.updateSession(sessionId, dto)));
 	}
+
+    //Get current user session
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<List<SessionResponseDTO>>> mySessions() {
+        return ResponseEntity.ok(new ApiResponse<>(true, "My sessions", sessionService.mySessions()));
+    }
 }

@@ -12,6 +12,8 @@ import com.skillSwap.Security.CurrentUserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SessionService {
 
@@ -103,6 +105,23 @@ public class SessionService {
 
 		return modelMapper.map(updated, SessionResponseDTO.class);
 	}
+
+    public List<SessionResponseDTO> mySessions() {
+        User me = currentUserService.getCurrentUser();
+        return sessionRepository.findUserSessions(me.getId()).stream().map(this::toDto).toList();
+    }
+    private SessionResponseDTO toDto(Session s) {
+        SessionResponseDTO d = new SessionResponseDTO();
+        d.setId(s.getId());
+        d.setProviderId(s.getProvider().getId());
+        d.setLearnerId(s.getLearner().getId());
+        d.setProviderName(s.getProvider().getName());
+        d.setLearnerName(s.getLearner().getName());
+        d.setSkillName(s.getSkill() != null ? s.getSkill().getName() : null);
+        d.setStatus(s.getStatus());
+        d.setSessionTime(s.getSessionTime());
+        return d;
+    }
 }
 //
 //@Service

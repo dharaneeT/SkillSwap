@@ -15,4 +15,7 @@ public class SessionResponseDTO {
 	private String skillName;
 	private SessionStatus status;
 	private LocalDateTime sessionTime;
+
+    private Integer providerId;  // NEW
+    private Integer learnerId;   // NEW
 }

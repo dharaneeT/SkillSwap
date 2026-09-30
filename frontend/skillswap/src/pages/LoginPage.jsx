@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getErrorMessage } from "../api/axios";
 
@@ -9,6 +9,7 @@ const inputClass =
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const from = useLocation().state?.from?.pathname || "/dashboard";
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    navigate(from, { replace: true });
     setError("");
     setLoading(true);
     try {

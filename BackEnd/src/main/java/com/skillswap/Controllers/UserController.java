@@ -4,9 +4,9 @@ import com.skillSwap.Dto.response.ApiResponse;
 import com.skillSwap.Dto.user.UserProfileDTO;
 import com.skillSwap.Dto.user.UserResponseDTO;
 import com.skillSwap.Exception.UserNotFoundException;
+import com.skillSwap.Security.CurrentUserService;
 import com.skillSwap.Service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,11 +18,13 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User API", description = "User management APIs")
 public class UserController {
 
-	@Autowired
 	private UserService userService;
 
-	public UserController(UserService userService) {
+	private CurrentUserService currentUserService;
+
+	public UserController(UserService userService, CurrentUserService currentUserService) {
 		this.userService = userService;
+		this.currentUserService = currentUserService;
 	}
 
 	//	//CREATE USER
@@ -80,5 +82,12 @@ public class UserController {
 	@GetMapping("/profile/{id}")
 	public ResponseEntity<ApiResponse<UserProfileDTO>> getProfile(@PathVariable Integer id) {
 		return ResponseEntity.ok(new ApiResponse<>(true, "User profile", userService.getUserProfile(id)));
+	}
+
+	// "who am I" – the frontend uses this to get my id, credits and skills
+	@GetMapping("/me")
+	public ResponseEntity<ApiResponse<UserProfileDTO>> me() {
+		Integer myId = currentUserService.getCurrentUser().getId();
+		return ResponseEntity.ok(new ApiResponse<>(true, "My profile", userService.getUserProfile(myId)));
 	}
 }
