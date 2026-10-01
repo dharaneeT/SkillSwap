@@ -1,5 +1,6 @@
 package com.skillSwap.Dto.review;
 
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Data
@@ -8,7 +9,9 @@ import lombok.*;
 public class ReviewResponseDTO {
 
 	private Integer id;
-	private String name;
+	private Integer sessionId;
+	private String name; // reviewer (the learner)
 	private int rating;
 	private String comment;
+	private LocalDateTime createdAt;
 }

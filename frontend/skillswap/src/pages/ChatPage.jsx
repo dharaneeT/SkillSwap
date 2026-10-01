@@ -15,6 +15,12 @@ export default function ChatPage() {
   const [text, setText] = useState("");
   const [error, setError] = useState("");
   const bottomRef = useRef(null);
+  const wsRef = useRef(null);
+  const activeRef = useRef(null);
+
+  useEffect(() => {
+    activeRef.current = activeId;
+  }, [activeId]);
 
   // 1) who am I + who have I talked to (+ the person in the URL if it's a new chat)
   useEffect(() => {
@@ -40,21 +46,41 @@ export default function ChatPage() {
     };
   }, [activeId]);
 
-  // 2) load the open conversation and poll every 3s
+  // 2) history once per conversation (no more polling)
   useEffect(() => {
     if (!activeId) return;
     let ignore = false;
-    const load = () =>
-      fetchConversation(activeId)
-        .then((res) => !ignore && setMessages(res.data.data))
-        .catch((e) => !ignore && setError(getErrorMessage(e)));
-    load();
-    const timer = setInterval(load, 3000);
+    fetchConversation(activeId)
+      .then((res) => !ignore && setMessages(res.data.data))
+      .catch((e) => !ignore && setError(getErrorMessage(e)));
     return () => {
       ignore = true;
-      clearInterval(timer);
     };
   }, [activeId]);
+
+  // 2b) one socket for the lifetime of the page
+  useEffect(() => {
+    const token = encodeURIComponent(localStorage.getItem("token") ?? "");
+    const ws = new WebSocket(`${import.meta.env.VITE_WS_URL}?token=${token}`);
+    wsRef.current = ws;
+    ws.onmessage = (ev) => {
+      const msg = JSON.parse(ev.data);
+      if (msg.error) {
+        setError(msg.error);
+        return;
+      }
+      // only show it if it belongs to the open conversation
+      if (
+        msg.senderId !== activeRef.current &&
+        msg.receiverId !== activeRef.current
+      )
+        return;
+      setMessages((prev) =>
+        prev.some((m) => m.id === msg.id) ? prev : [...prev, msg],
+      );
+    };
+    return () => ws.close();
+  }, []);
 
   // 3) keep the newest message in view
   useEffect(() => {
@@ -70,15 +96,23 @@ export default function ChatPage() {
     e.preventDefault();
     const content = text.trim();
     if (!content || !activeId) return;
-    setText("");
     setError("");
+
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ receiverId: activeId, content }));
+      setText(""); // the saved message comes back through onmessage
+      return;
+    }
+
+    setText("");
     try {
       await sendMessage({ receiverId: activeId, content });
       const res = await fetchConversation(activeId);
       setMessages(res.data.data);
     } catch (err) {
       setError(getErrorMessage(err));
-      setText(content); // give the text back
+      setText(content);
     }
   };
 

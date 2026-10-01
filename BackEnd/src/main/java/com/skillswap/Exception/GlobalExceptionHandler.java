@@ -15,21 +15,22 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(new ErrorResponseDTO(false, message, status.value(), LocalDateTime.now()), status);
 	}
 
-    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class) // race / DB unique
-    public ResponseEntity<ErrorResponseDTO> handleIntegrity(Exception ex) {
-        return build(HttpStatus.CONFLICT, "Operation violates a data constraint (e.g. email already exists)");
-    }
+	@ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class) // race / DB unique
+	public ResponseEntity<ErrorResponseDTO> handleIntegrity(Exception ex) {
+		return build(HttpStatus.CONFLICT, "Operation violates a data constraint (e.g. email already exists)");
+	}
 
-    @ExceptionHandler(IllegalArgumentException.class)                  // AdminService throws this -> 400
-    public ResponseEntity<ErrorResponseDTO> handleIllegalArg(IllegalArgumentException ex) {
-        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
+	@ExceptionHandler(IllegalArgumentException.class) // AdminService throws this -> 400
+	public ResponseEntity<ErrorResponseDTO> handleIllegalArg(IllegalArgumentException ex) {
+		return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+	}
 
-    @ExceptionHandler(Exception.class)                                 // fallback, keep LAST
-    public ResponseEntity<ErrorResponseDTO> handleAny(Exception ex) {
-        ex.printStackTrace(); // or a logger
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
-    }
+	@ExceptionHandler(Exception.class) // fallback, keep LAST
+	public ResponseEntity<ErrorResponseDTO> handleAny(Exception ex) {
+		ex.printStackTrace(); // or a logger
+		return build(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
+	}
+
 	// wrong password / unknown email  → 401 (generic message: don't reveal which one was wrong)
 	@ExceptionHandler(AuthenticationException.class)
 	public ResponseEntity<ErrorResponseDTO> handleAuth(AuthenticationException ex) {
@@ -63,6 +64,11 @@ public class GlobalExceptionHandler {
 			.findFirst()
 			.orElse("Validation failed");
 		return build(HttpStatus.BAD_REQUEST, msg);
+	}
+
+	@ExceptionHandler({ SessionConflictException.class, InvalidSessionStateException.class })
+	public ResponseEntity<ErrorResponseDTO> handleSessionConflict(RuntimeException ex) {
+		return build(HttpStatus.CONFLICT, ex.getMessage());
 	}
 
 	//    // duplicates / time conflicts / illegal state changes → 409  (classes added in Steps 1 and 4)

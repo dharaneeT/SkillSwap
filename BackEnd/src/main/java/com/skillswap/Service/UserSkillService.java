@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,6 +37,7 @@ public class UserSkillService {
 	}
 
 	//ADDING USER_SKILL
+    @CacheEvict(cacheNames = "skillSearch", allEntries = true)
 	@Operation(summary = "ADDING A USER_SKILL")
 	public UserSkillResponseDTO addUserSkill(UserSkillRequestDTO dto) {
 		User user = userService.getUserEntityById(dto.getUserId());

@@ -34,4 +34,7 @@ public class Session {
 
 	@Enumerated(EnumType.STRING)
 	private SessionStatus status;
+
+	@Column(nullable = false, columnDefinition = "boolean default false")
+	private boolean reminderSent = false;
 }

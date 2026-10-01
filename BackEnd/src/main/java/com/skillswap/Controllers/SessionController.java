@@ -7,47 +7,70 @@ import com.skillSwap.Dto.session.SessionResponseDTO;
 import com.skillSwap.Service.SessionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/skillswap/v1/session")
-@Tag(name = "Session API", description = "Session management APIs")
+@Tag(name = "Session API", description = "Session booking APIs")
 public class SessionController {
 
-	@Autowired
-	private SessionService sessionService;
+	private final SessionService sessionService;
 
 	public SessionController(SessionService sessionService) {
 		this.sessionService = sessionService;
 	}
 
-	//booking session
 	@PostMapping("/book-session")
 	public ResponseEntity<ApiResponse<SessionResponseDTO>> bookSession(@Valid @RequestBody SessionRequestDTO dto) {
 		return ResponseEntity
-			.status(HttpStatus.OK)
-			.body(new ApiResponse<>(true, "Session Booked", sessionService.bookSession(dto)));
+			.status(HttpStatus.CREATED)
+			.body(new ApiResponse<>(true, "Session booked", sessionService.bookSession(dto)));
 	}
 
-	//Update Session
+	@PutMapping("/{sessionId}/accept")
+	public ResponseEntity<ApiResponse<SessionResponseDTO>> accept(@PathVariable Integer sessionId) {
+		return ok("Session accepted", sessionService.accept(sessionId));
+	}
+
+	@PutMapping("/{sessionId}/reject")
+	public ResponseEntity<ApiResponse<SessionResponseDTO>> reject(@PathVariable Integer sessionId) {
+		return ok("Session rejected", sessionService.reject(sessionId));
+	}
+
+	@PutMapping("/{sessionId}/cancel")
+	public ResponseEntity<ApiResponse<SessionResponseDTO>> cancel(@PathVariable Integer sessionId) {
+		return ok("Session cancelled", sessionService.cancel(sessionId));
+	}
+
+	@PutMapping("/{sessionId}/complete")
+	public ResponseEntity<ApiResponse<SessionResponseDTO>> complete(@PathVariable Integer sessionId) {
+		return ok("Session completed", sessionService.complete(sessionId));
+	}
+
+	// kept for the existing frontend: PUT /update/{id} with {"status": "..."}
 	@PutMapping("/update/{sessionId}")
-	public ResponseEntity<ApiResponse<SessionResponseDTO>> updateSession(
+	public ResponseEntity<ApiResponse<SessionResponseDTO>> update(
 		@PathVariable Integer sessionId,
 		@Valid @RequestBody SessionActionDTO dto
 	) {
-		return ResponseEntity
-			.status(HttpStatus.ACCEPTED)
-			.body(new ApiResponse<>(true, "Session Updated", sessionService.updateSession(sessionId, dto)));
+		return switch (dto.getStatus()) {
+			case ACCEPTED -> ok("Session accepted", sessionService.accept(sessionId));
+			case REJECTED -> ok("Session rejected", sessionService.reject(sessionId));
+			case CANCELLED -> ok("Session cancelled", sessionService.cancel(sessionId));
+			case COMPLETED -> ok("Session completed", sessionService.complete(sessionId));
+			default -> throw new IllegalArgumentException("Status " + dto.getStatus() + " cannot be set manually");
+		};
 	}
 
-    //Get current user session
-    @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<SessionResponseDTO>>> mySessions() {
-        return ResponseEntity.ok(new ApiResponse<>(true, "My sessions", sessionService.mySessions()));
-    }
+	@GetMapping("/my")
+	public ResponseEntity<ApiResponse<List<SessionResponseDTO>>> mySessions() {
+		return ok("My sessions", sessionService.mySessions());
+	}
+
+	private <T> ResponseEntity<ApiResponse<T>> ok(String message, T data) {
+		return ResponseEntity.ok(new ApiResponse<>(true, message, data));
+	}
 }

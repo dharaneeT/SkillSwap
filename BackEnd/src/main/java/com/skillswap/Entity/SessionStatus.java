@@ -5,5 +5,6 @@ public enum SessionStatus {
 	REQUESTED,
 	ACCEPTED,
 	COMPLETED,
+	REJECTED,
 	CANCELLED
 }

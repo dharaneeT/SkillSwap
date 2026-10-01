@@ -82,6 +82,8 @@ public class UserService {
 		dto.setName(user.getName());
 		dto.setEmail(user.getEmail());
 		dto.setCredits(user.getCredits());
+		dto.setAverageRating(user.getAverageRating() == null ? 0.0 : user.getAverageRating());
+		dto.setReviewCount(user.getReviewCount() == null ? 0 : user.getReviewCount());
 
 		// OFFERED SKILLS
 		List<String> offered = user

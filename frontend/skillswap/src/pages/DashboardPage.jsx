@@ -179,6 +179,12 @@ export default function DashboardPage() {
                       Accept
                     </button>
                   )}
+                  <button
+                    onClick={() => handleStatus(s.id, "REJECTED")}
+                    className={`${btn} bg-green-300 text-slate-900`}
+                  >
+                    Reject
+                  </button>
                   {isProvider && s.status === "ACCEPTED" && (
                     <button
                       onClick={() => handleStatus(s.id, "COMPLETED")}

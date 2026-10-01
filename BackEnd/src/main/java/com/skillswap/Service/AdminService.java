@@ -11,6 +11,7 @@ import com.skillSwap.Security.CurrentUserService;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -56,6 +57,7 @@ public class AdminService {
 		target.setRole(role);
 	}
 
+    @CacheEvict(cacheNames = "skillSearch", allEntries = true)
 	@Transactional
 	public void deleteSkill(Integer skillId) {
 		if (!skillRepository.existsById(skillId)) throw new SkillNotFoundException(skillId);

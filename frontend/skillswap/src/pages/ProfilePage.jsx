@@ -130,6 +130,11 @@ export default function ProfilePage() {
           </button>
         </div>
       </form>
+      <p className="text-sm text-slate-300">
+        {profile.reviewCount > 0
+          ? `★ ${profile.averageRating.toFixed(1)} (${profile.reviewCount} reviews)`
+          : "No reviews yet"}
+      </p>
     </main>
   );
 }

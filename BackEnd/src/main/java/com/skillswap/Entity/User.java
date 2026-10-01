@@ -41,4 +41,8 @@ public class User {
 	private String city;
 	private Double latitude;
 	private Double longitude;
+
+    // FOR RATING
+    private Double averageRating = 0.0;
+    private Integer reviewCount = 0;
 }

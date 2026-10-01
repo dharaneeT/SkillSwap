@@ -15,4 +15,7 @@ public class UserProfileDTO {
 
 	private List<String> offeredSkills;
 	private List<String> wantedSkills;
+
+	private Double averageRating;
+	private Integer reviewCount;
 }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +26,7 @@ public class SkillService {
 	private ModelMapper modelMapper;
 
 	//CREATE A SKILL
+    @CacheEvict(cacheNames = "skillSearch", allEntries = true)
 	@Operation(summary = "CREATE NEW SKILL ")
 	public SkillResponseDTO addSkill(SkillRequestDTO dto) {
 		Skill skill = modelMapper.map(dto, Skill.class);
