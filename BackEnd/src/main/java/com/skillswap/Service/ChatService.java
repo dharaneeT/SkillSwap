@@ -56,7 +56,12 @@ public class ChatService {
 		User me = currentUserService.getCurrentUser();
 		Map<Integer, ChatPartnerDTO> map = new LinkedHashMap<>(); // newest conversation first
 		for (Message m : messageRepository.findAllFor(me.getId())) {
+			//Find “the other person” in chat
+			//Example:
+			//If I sent → receiver is partner
+			//If I received → sender is partner
 			User other = m.getSender().getId().equals(me.getId()) ? m.getReceiver() : m.getSender();
+			//Avoid duplicates
 			map.putIfAbsent(other.getId(), new ChatPartnerDTO(other.getId(), other.getName()));
 		}
 		return new ArrayList<>(map.values());

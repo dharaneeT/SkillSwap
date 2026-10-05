@@ -16,11 +16,20 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.util.UriComponentsBuilder;
 
+
+//This class is a Spring component that intercepts WebSocket connections before they are established.
+// By implementing HandshakeInterceptor,
+// it gets control at the exact moment when the client tries to connect to /ws.
 @Component
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
+    //This is a key name used to store the user’s ID inside the WebSocket session.
     public static final String USER_ID = "userId";
 
+
+    //Decode JWT → JwtService → gives email
+    //Load user from Spring Security → UserDetailsService → security validation
+    //Fetch full user entity → UserRepository → actual DB user (to get ID)
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
     private final UserRepository userRepository;
@@ -35,13 +44,21 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler handler, Map<String, Object> attributes) {
+        //Extract Token
         String token = resolveToken(request);
         if (token == null) return reject(response);
         try {
+            //Extract Email from JWT
             String email = jwtService.extractUsername(token);
+            //Load UserDetails
+            //Fetch user from database via Spring Security Returns,
+            //password
+            //roles
+            //status
             UserDetails ud = userDetailsService.loadUserByUsername(email);
             if (!ud.isEnabled() || !jwtService.validateToken(token, ud)) return reject(response);
             User user = userRepository.findByEmail(email).orElseThrow();
+            //Store userId in Session
             attributes.put(USER_ID, user.getId());      // available later via session.getAttributes()
             return true;
         } catch (Exception e) {

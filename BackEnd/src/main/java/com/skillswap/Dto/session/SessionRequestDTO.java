@@ -14,9 +14,6 @@ public class SessionRequestDTO {
 	@Schema(example = "1")
 	private Integer providerId;
 
-	//	@NotNull(message = "LEARNER_ID should not be Empty")
-	//	@Schema(example = "2")
-	//	private Integer learnerId;
 
 	@NotNull(message = "SKILL_ID should not be Empty")
 	@Schema(example = "1")

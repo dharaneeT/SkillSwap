@@ -19,6 +19,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(handler, "/ws").addInterceptors(jwtInterceptor).setAllowedOrigins("http://localhost:5173"); // your Vite dev server
+		registry.addHandler(handler, "/ws").addInterceptors(jwtInterceptor).setAllowedOrigins("http://localhost:5173"); //  Vite dev server
 	}
 }

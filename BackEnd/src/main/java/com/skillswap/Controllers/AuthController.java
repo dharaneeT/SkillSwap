@@ -34,3 +34,23 @@ public class AuthController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Login successful", authService.login(req)));
     }
 }
+
+//User sends signup request
+//        ↓
+//AuthController.signup()
+//        ↓
+//AuthService.signup()
+//        ↓
+//User saved in DB
+//        ↓
+//Wallet credit added
+//        ↓
+//UserRegisteredEvent published
+//        ↓
+//NotificationListener catches event
+//        ↓
+//EmailService.send()
+//        ↓
+//JavaMailSender → SMTP server
+//        ↓
+//Email delivered

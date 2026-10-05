@@ -5,6 +5,7 @@ import { fetchSkills } from "../api/skillApi";
 import { fetchMatches } from "../api/matchApi";
 import { bookSession, fetchMySessions, updateSession } from "../api/sessionApi";
 import { getErrorMessage } from "../api/axios";
+import { addReview } from "../api/reviewApi";
 
 const card = "rounded-xl bg-slate-800 border border-slate-700 p-4";
 const btn = "rounded-lg px-3 py-1 text-sm font-semibold cursor-pointer";
@@ -17,6 +18,8 @@ export default function DashboardPage() {
   const [times, setTimes] = useState({}); // "userId-skill" -> datetime-local value
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [reviewing, setReviewing] = useState(null); // session id whose form is open
+  const [review, setReview] = useState({ rating: 0, comment: "" });
 
   const loadAll = useCallback(async () => {
     const meRes = await fetchMe();
@@ -62,6 +65,26 @@ export default function DashboardPage() {
     setError("");
     try {
       await updateSession(id, status);
+      await loadAll();
+    } catch (e) {
+      setError(getErrorMessage(e));
+    }
+  };
+
+  const submitReview = async (sessionId) => {
+    if (!review.rating) {
+      setError("Choose a star rating first");
+      return;
+    }
+    setError("");
+    try {
+      await addReview({
+        sessionId,
+        rating: review.rating,
+        comment: review.comment.trim() || null,
+      });
+      setReviewing(null);
+      setReview({ rating: 0, comment: "" });
       await loadAll();
     } catch (e) {
       setError(getErrorMessage(e));
@@ -151,6 +174,8 @@ export default function DashboardPage() {
             const isProvider = s.providerId === me?.id;
             const isLearner = s.learnerId === me?.id;
             const open = ["PENDING", "REQUESTED"].includes(s.status);
+            const canReview =
+              isLearner && s.status === "COMPLETED" && !s.reviewed;
             return (
               <li
                 key={s.id}
@@ -170,21 +195,23 @@ export default function DashboardPage() {
                     · {s.status}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   {isProvider && open && (
-                    <button
-                      onClick={() => handleStatus(s.id, "ACCEPTED")}
-                      className={`${btn} bg-green-300 text-slate-900`}
-                    >
-                      Accept
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleStatus(s.id, "ACCEPTED")}
+                        className={`${btn} bg-green-300 text-slate-900`}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => handleStatus(s.id, "REJECTED")}
+                        className={`${btn} border border-slate-600`}
+                      >
+                        Reject
+                      </button>
+                    </>
                   )}
-                  <button
-                    onClick={() => handleStatus(s.id, "REJECTED")}
-                    className={`${btn} bg-green-300 text-slate-900`}
-                  >
-                    Reject
-                  </button>
                   {isProvider && s.status === "ACCEPTED" && (
                     <button
                       onClick={() => handleStatus(s.id, "COMPLETED")}
@@ -201,7 +228,76 @@ export default function DashboardPage() {
                       Cancel
                     </button>
                   )}
+                  {canReview && reviewing !== s.id && (
+                    <button
+                      onClick={() => {
+                        setReviewing(s.id);
+                        setReview({ rating: 0, comment: "" });
+                      }}
+                      className={`${btn} bg-red-200 text-slate-900`}
+                    >
+                      Leave a review
+                    </button>
+                  )}
+                  {isLearner && s.status === "COMPLETED" && s.reviewed && (
+                    <span className="text-sm text-green-300">Reviewed ✓</span>
+                  )}
                 </div>
+
+                {canReview && reviewing === s.id && (
+                  <div className="w-full space-y-3 border-t border-slate-700 pt-3">
+                    <p className="text-sm text-slate-300">
+                      How was your session with {s.providerName}?
+                    </p>
+                    <div
+                      className="flex gap-1"
+                      role="radiogroup"
+                      aria-label="Rating"
+                    >
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          role="radio"
+                          aria-checked={review.rating === n}
+                          aria-label={`${n} star${n > 1 ? "s" : ""}`}
+                          onClick={() => setReview({ ...review, rating: n })}
+                          className={`text-3xl leading-none cursor-pointer ${
+                            n <= review.rating
+                              ? "text-yellow-300"
+                              : "text-slate-600"
+                          }`}
+                        >
+                          ★
+                        </button>
+                      ))}
+                    </div>
+                    <textarea
+                      rows={3}
+                      maxLength={500}
+                      placeholder="Say something about the session (optional)"
+                      value={review.comment}
+                      onChange={(e) =>
+                        setReview({ ...review, comment: e.target.value })
+                      }
+                      className="w-full rounded-lg bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-red-200"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => submitReview(s.id)}
+                        className={`${btn} bg-red-200 text-slate-900`}
+                      >
+                        Submit review
+                      </button>
+                      <button
+                        onClick={() => setReviewing(null)}
+                        className={`${btn} border border-slate-600`}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </li>
             );
           })}

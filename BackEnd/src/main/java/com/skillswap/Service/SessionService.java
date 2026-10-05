@@ -8,11 +8,14 @@ import com.skillSwap.Exception.CreditException;
 import com.skillSwap.Exception.InvalidSessionStateException;
 import com.skillSwap.Exception.SessionConflictException;
 import com.skillSwap.Exception.SessionNotFoundException;
+import com.skillSwap.Repository.ReviewRepository;
 import com.skillSwap.Repository.SessionRepository;
 import com.skillSwap.Repository.UserRepository;
 import com.skillSwap.Security.CurrentUserService;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
@@ -32,6 +35,7 @@ public class SessionService {
 	private final ApplicationEventPublisher events;
 	private final int sessionCost;
 	private final int durationMinutes;
+	private final ReviewRepository reviewRepository;
 
 	public SessionService(
 		SessionRepository sessionRepository,
@@ -42,7 +46,8 @@ public class SessionService {
 		CreditWalletService wallet,
 		ApplicationEventPublisher events,
 		@Value("${skillswap.credits.session-cost}") int sessionCost,
-		@Value("${skillswap.session.duration-minutes:60}") int durationMinutes
+		@Value("${skillswap.session.duration-minutes:60}") int durationMinutes,
+		ReviewRepository reviewRepository
 	) {
 		this.sessionRepository = sessionRepository;
 		this.userRepository = userRepository;
@@ -53,6 +58,7 @@ public class SessionService {
 		this.events = events;
 		this.sessionCost = sessionCost;
 		this.durationMinutes = durationMinutes;
+		this.reviewRepository = reviewRepository;
 	}
 
 	// ---------- BOOK (learner = logged-in user) ----------
@@ -213,7 +219,18 @@ public class SessionService {
 	@Transactional(readOnly = true)
 	public List<SessionResponseDTO> mySessions() {
 		User me = currentUserService.getCurrentUser();
-		return sessionRepository.findUserSessions(me.getId()).stream().map(this::toDto).toList();
+		List<Session> list = sessionRepository.findUserSessions(me.getId());
+		Set<Integer> reviewed = list.isEmpty()
+			? Set.of()
+			: new HashSet<>(reviewRepository.findReviewedSessionIds(list.stream().map(Session::getId).toList()));
+		return list
+			.stream()
+			.map(s -> {
+				SessionResponseDTO d = toDto(s);
+				d.setReviewed(reviewed.contains(s.getId()));
+				return d;
+			})
+			.toList();
 	}
 
 	// ---------- helpers ----------

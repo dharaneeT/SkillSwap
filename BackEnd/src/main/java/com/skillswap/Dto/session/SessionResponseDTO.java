@@ -16,6 +16,8 @@ public class SessionResponseDTO {
 	private SessionStatus status;
 	private LocalDateTime sessionTime;
 
-    private Integer providerId;  // NEW
-    private Integer learnerId;   // NEW
+	private Integer providerId; // NEW
+	private Integer learnerId; // NEW
+
+	private boolean reviewed;
 }

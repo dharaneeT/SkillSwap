@@ -1,6 +1,8 @@
 package com.skillSwap.Repository;
 
 import com.skillSwap.Entity.Review;
+import java.util.Collection;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +23,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
 	@Query("SELECT AVG(r.rating) AS average, COUNT(r) AS total FROM Review r WHERE r.session.provider.id = :providerId")
 	RatingStats statsForProvider(@Param("providerId") Integer providerId);
+
+	@Query("SELECT r.session.id FROM Review r WHERE r.session.id IN :ids")
+	List<Integer> findReviewedSessionIds(@Param("ids") Collection<Integer> ids);
 }

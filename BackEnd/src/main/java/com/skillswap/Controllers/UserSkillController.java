@@ -1,6 +1,7 @@
 package com.skillSwap.Controllers;
 
 import com.skillSwap.Dto.response.ApiResponse;
+import com.skillSwap.Dto.userskill.UserSkillByNameRequestDTO;
 import com.skillSwap.Dto.userskill.UserSkillRequestDTO;
 import com.skillSwap.Dto.userskill.UserSkillResponseDTO;
 import com.skillSwap.Service.UserSkillService;
@@ -29,6 +30,15 @@ public class UserSkillController {
 		UserSkillResponseDTO data = userSkillService.addUserSkill(dto);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "User Skill added", data));
+	}
+
+	@PostMapping("/by-name")
+	public ResponseEntity<ApiResponse<UserSkillResponseDTO>> addByName(
+		@Valid @RequestBody UserSkillByNameRequestDTO dto
+	) {
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
+			.body(new ApiResponse<>(true, "Skill added", userSkillService.addByName(dto)));
 	}
 
 	@GetMapping("/get")
