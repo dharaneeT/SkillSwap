@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 function Header() {
   const { user, isAdmin, logout } = useAuth();
+  //note Gives the component a function that can programmatically change routes.
   const navigate = useNavigate();
 
   const handleLogout = () => {

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { searchSkills } from "../api/skillApi";
-import { getErrorMessage } from "../api/axios";
+import { useFetch } from "../hooks/useFetch";
 
 const PAGE_SIZE = 12;
+
 const field =
   "rounded-lg bg-slate-800 border border-slate-600 px-3 py-2 outline-none focus:border-red-200";
 
@@ -13,14 +14,14 @@ export default function SkillsListPage() {
   const [minRating, setMinRating] = useState("");
   const [sort, setSort] = useState("name,asc");
   const [page, setPage] = useState(0);
-  const [result, setResult] = useState({ key: null, data: null, error: "" });
 
-  // wait 300 ms after typing stops before searching
+  // Wait 300 ms after typing stops before searching
   useEffect(() => {
     const t = setTimeout(() => {
       setDebounced(search.trim());
       setPage(0);
     }, 300);
+
     return () => clearTimeout(t);
   }, [search]);
 
@@ -32,25 +33,8 @@ export default function SkillsListPage() {
     ...(type && { type }),
     ...(minRating && { minRating }),
   };
-  const key = JSON.stringify(params);
 
-  useEffect(() => {
-    let ignore = false;
-    searchSkills(JSON.parse(key))
-      .then(
-        (res) => !ignore && setResult({ key, data: res.data.data, error: "" }),
-      )
-      .catch(
-        (e) =>
-          !ignore && setResult({ key, data: null, error: getErrorMessage(e) }),
-      );
-    return () => {
-      ignore = true;
-    };
-  }, [key]);
-
-  const loading = result.key !== key;
-  const data = result.data;
+  const { data, error, loading } = useFetch(searchSkills, params);
 
   return (
     <main className="max-w-4xl mx-auto px-4 pt-10">
@@ -64,6 +48,7 @@ export default function SkillsListPage() {
           maxLength={50}
           onChange={(e) => setSearch(e.target.value)}
         />
+
         <select
           className={field}
           value={type}
@@ -76,6 +61,7 @@ export default function SkillsListPage() {
           <option value="OFFERED">Offered by someone</option>
           <option value="WANTED">Wanted by someone</option>
         </select>
+
         <select
           className={field}
           value={minRating}
@@ -88,6 +74,7 @@ export default function SkillsListPage() {
           <option value="3">Providers 3★ and up</option>
           <option value="4">Providers 4★ and up</option>
         </select>
+
         <select
           className={field}
           value={sort}
@@ -102,12 +89,14 @@ export default function SkillsListPage() {
         </select>
       </div>
 
-      {result.error && !loading && (
+      {error && !loading && (
         <p className="rounded-lg bg-red-900/50 border border-red-500 px-3 py-2 text-sm">
-          {result.error}
+          {error}
         </p>
       )}
+
       {loading && <p className="text-slate-400">Searching...</p>}
+
       {!loading && data && data.content.length === 0 && (
         <p className="text-slate-400">No skills match your filters.</p>
       )}
@@ -137,10 +126,12 @@ export default function SkillsListPage() {
           >
             Prev
           </button>
+
           <span className="text-slate-400">
             Page {data.page + 1} of {data.totalPages} · {data.totalElements}{" "}
             skills
           </span>
+
           <button
             disabled={!data.hasNext}
             onClick={() => setPage((p) => p + 1)}

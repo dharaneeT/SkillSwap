@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { fetchSkills } from "../api/skillApi";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useAuth } from "../hooks/useAuth";
+import { useFetch } from "../hooks/useFetch";
+import { loadSkills } from "../store/skillsSlice";
 import {
   activateUser,
   addCredits,
@@ -11,33 +13,31 @@ import {
 } from "../api/adminApi";
 import { getErrorMessage } from "../api/axios";
 
-const btn =
-  "rounded-lg border border-slate-600 px-2 py-1 text-xs cursor-pointer hover:bg-slate-700";
-
 export default function AdminPage() {
   const { user: authUser } = useAuth();
-  const [users, setUsers] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [error, setError] = useState("");
-
-  const load = useCallback(async () => {
-    const [u, s] = await Promise.all([fetchUsers(), fetchSkills()]);
-    setUsers(u.data.data);
-    setSkills(s.data.data);
-  }, []);
+  const dispatch = useDispatch();
+  const skills = useSelector((s) => s.skills.items);
+  const {
+    data: usersData,
+    error: loadError,
+    refetch: refetchUsers,
+  } = useFetch(fetchUsers);
+  const users = usersData ?? [];
+  const [actionError, setActionError] = useState("");
+  const error = actionError || loadError;
 
   useEffect(() => {
-    load().catch((e) => setError(getErrorMessage(e)));
-  }, [load]);
+    dispatch(loadSkills());
+  }, [dispatch]);
 
-  // run an admin action, then refresh the tables
-  const run = async (fn) => {
-    setError("");
+  const run = async (fn, { reloadSkills = false } = {}) => {
+    setActionError("");
     try {
       await fn();
-      await load();
+      refetchUsers();
+      if (reloadSkills) dispatch(loadSkills(true));
     } catch (e) {
-      setError(getErrorMessage(e));
+      setActionError(getErrorMessage(e));
     }
   };
 
@@ -136,7 +136,7 @@ export default function AdminPage() {
                 className={btn}
                 onClick={() =>
                   window.confirm(`Delete "${s.name}"?`) &&
-                  run(() => deleteSkill(s.id))
+                  run(() => deleteSkill(id), { reloadSkills: true })
                 }
               >
                 Delete

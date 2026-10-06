@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { getErrorMessage } from "../api/axios";
 
 const inputClass =
@@ -19,14 +19,13 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate(from, { replace: true });
     setError("");
     setLoading(true);
     try {
       await login(form);
-      navigate("/skills", { replace: true });
+      navigate(from, { replace: true }); // only after login succeeds; goes back to the page they wanted
     } catch (err) {
-      setError(getErrorMessage(err)); // e.g. "Invalid email or password"
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }

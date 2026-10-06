@@ -14,8 +14,11 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [error, setError] = useState("");
+  //note Used for auto-scrolling.
   const bottomRef = useRef(null);
+  //note Stores WebSocket instance.
   const wsRef = useRef(null);
+  //note Stores current conversation ID without forcing WebSocket effect to reconnect.
   const activeRef = useRef(null);
 
   useEffect(() => {

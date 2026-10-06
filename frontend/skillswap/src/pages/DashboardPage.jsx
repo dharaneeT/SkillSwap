@@ -1,82 +1,95 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchMe } from "../api/userApi";
-import { fetchSkills } from "../api/skillApi";
 import { fetchMatches } from "../api/matchApi";
-import { bookSession, fetchMySessions, updateSession } from "../api/sessionApi";
-import { getErrorMessage } from "../api/axios";
 import { addReview } from "../api/reviewApi";
+import { getErrorMessage } from "../api/axios";
+import { useFetch } from "../hooks/useFetch";
+import { loadSkills } from "../store/skillsSlice";
+import {
+  bookNewSession,
+  changeSessionStatus,
+  loadSessions,
+} from "../store/sessionsSlice";
 
 const card = "rounded-xl bg-slate-800 border border-slate-700 p-4";
 const btn = "rounded-lg px-3 py-1 text-sm font-semibold cursor-pointer";
 
+// .unwrap() throws the rejectWithValue string; axios errors need getErrorMessage
+const errMsg = (e) => (typeof e === "string" ? e : getErrorMessage(e));
+
 export default function DashboardPage() {
-  const [me, setMe] = useState(null);
-  const [sessions, setSessions] = useState([]);
-  const [matches, setMatches] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [times, setTimes] = useState({}); // "userId-skill" -> datetime-local value
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [reviewing, setReviewing] = useState(null); // session id whose form is open
+  const dispatch = useDispatch();
+  const skills = useSelector((s) => s.skills.items);
+  const { items: sessions, status } = useSelector((s) => s.sessions);
+
+  const {
+    data: me,
+    error: meError,
+    loading: meLoading,
+    refetch: refetchMe,
+  } = useFetch(fetchMe);
+  const { data: matchData } = useFetch(fetchMatches, me?.id, {
+    enabled: Boolean(me?.id), // wait until we know who "me" is
+  });
+  const matches = matchData ?? [];
+
+  const [times, setTimes] = useState({});
+  const [actionError, setActionError] = useState("");
+  const [reviewing, setReviewing] = useState(null);
   const [review, setReview] = useState({ rating: 0, comment: "" });
 
-  const loadAll = useCallback(async () => {
-    const meRes = await fetchMe();
-    const profile = meRes.data.data;
-    const [s, m, sk] = await Promise.all([
-      fetchMySessions(),
-      fetchMatches(profile.id),
-      fetchSkills(),
-    ]);
-    setMe(profile);
-    setSessions(s.data.data);
-    setMatches(m.data.data);
-    setSkills(sk.data.data);
-  }, []);
+  const error = actionError || meError; // use `error` in your JSX as before
 
   useEffect(() => {
-    loadAll()
-      .catch((e) => setError(getErrorMessage(e)))
-      .finally(() => setLoading(false));
-  }, [loadAll]);
+    dispatch(loadSessions());
+    dispatch(loadSkills()); // no-op if already cached
+  }, [dispatch]);
+
+  const loading =
+    (meLoading && !me) ||
+    status === "idle" ||
+    (status === "loading" && sessions.length === 0);
 
   const handleBook = async (match) => {
-    setError("");
+    setActionError("");
     const key = `${match.userId}-${match.matchedSkill}`;
     const skill = skills.find((s) => s.name === match.matchedSkill);
     if (!skill || !times[key]) {
-      setError("Pick a date and time first");
+      setActionError("Pick a date and time first");
       return;
     }
     try {
-      await bookSession({
-        providerId: match.userId,
-        skillId: skill.id,
-        sessionTime: times[key], // e.g. 2026-10-05T11:00
-      });
-      await loadAll();
+      await dispatch(
+        bookNewSession({
+          providerId: match.userId,
+          skillId: skill.id,
+          sessionTime: times[key],
+        }),
+      ).unwrap();
+      refetchMe(); // credits may have changed
     } catch (e) {
-      setError(getErrorMessage(e));
+      setActionError(errMsg(e));
     }
   };
 
   const handleStatus = async (id, status) => {
-    setError("");
+    setActionError("");
     try {
-      await updateSession(id, status);
-      await loadAll();
+      await dispatch(changeSessionStatus({ id, status })).unwrap();
+      refetchMe();
     } catch (e) {
-      setError(getErrorMessage(e));
+      setActionError(errMsg(e));
     }
   };
 
   const submitReview = async (sessionId) => {
     if (!review.rating) {
-      setError("Choose a star rating first");
+      setActionError("Choose a star rating first");
       return;
     }
-    setError("");
+    setActionError("");
     try {
       await addReview({
         sessionId,
@@ -85,18 +98,11 @@ export default function DashboardPage() {
       });
       setReviewing(null);
       setReview({ rating: 0, comment: "" });
-      await loadAll();
+      dispatch(loadSessions()); // refresh the `reviewed` flag
     } catch (e) {
-      setError(getErrorMessage(e));
+      setActionError(getErrorMessage(e));
     }
   };
-
-  if (loading)
-    return (
-      <main className="max-w-4xl mx-auto px-4 pt-10 text-slate-400">
-        Loading...
-      </main>
-    );
 
   return (
     <main className="max-w-4xl mx-auto px-4 pt-10 space-y-10">

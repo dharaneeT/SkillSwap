@@ -1,8 +1,9 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 export default function ProtectedRoute({ adminOnly = false }) {
   const { user, isAdmin } = useAuth();
+  //note Gets the current URL.
   const location = useLocation();
 
   if (!user) {

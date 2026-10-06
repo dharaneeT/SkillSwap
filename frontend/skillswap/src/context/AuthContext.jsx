@@ -1,48 +1,67 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 import { loginRequest, signupRequest } from "../api/authApi";
+import { skillsCleared } from "../store/skillsSlice";
+import { sessionsCleared } from "../store/sessionsSlice";
 
-const AuthContext = createContext(null);
+// eslint-disable-next-line react-refresh/only-export-components
+export const AuthContext = createContext(null);
+
+function readStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user"));
+  } catch {
+    return null;
+  }
+}
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user"));
-    } catch {
-      return null;
-    }
-  });
+  const dispatch = useDispatch();
+  const [user, setUser] = useState(readStoredUser);
 
-  const saveSession = (auth) => {
+  const saveSession = useCallback((auth) => {
     const u = { email: auth.email, role: auth.role };
-    localStorage.setItem("token", auth.token);
+    localStorage.setItem("token", auth.token); // axios.js reads this key
     localStorage.setItem("user", JSON.stringify(u));
     setUser(u);
-  };
+  }, []);
 
-  const login = async (credentials) => {
-    const res = await loginRequest(credentials);
-    saveSession(res.data.data); // res.data = ApiResponse, .data = AuthResponseDTO
-  };
+  const login = useCallback(
+    async (credentials) => {
+      const res = await loginRequest(credentials);
+      saveSession(res.data.data); // ApiResponse.data = AuthResponseDTO
+    },
+    [saveSession],
+  );
 
-  const signup = async (form) => {
-    const res = await signupRequest(form);
-    saveSession(res.data.data); // your backend returns a token on signup too
-  };
+  const signup = useCallback(
+    async (form) => {
+      const res = await signupRequest(form);
+      saveSession(res.data.data);
+    },
+    [saveSession],
+  );
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-  };
+    dispatch(skillsCleared()); // wipe Redux data on logout
+    dispatch(sessionsCleared());
+  }, [dispatch]);
 
-  const isAdmin = user?.role === "ROLE_ADMIN";
-
-  return (
-    <AuthContext.Provider value={{ user, login, signup, logout }}>
-      {children}
-    </AuthContext.Provider>
+  // useMemo: consumers only re-render when something here actually changes
+  const value = useMemo(
+    () => ({
+      user,
+      isAuthenticated: Boolean(user),
+      isAdmin: user?.role === "ROLE_ADMIN", // backend sends the Spring authority string
+      login,
+      signup,
+      logout,
+    }),
+    [user, login, signup, logout],
   );
-}
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => useContext(AuthContext);
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
