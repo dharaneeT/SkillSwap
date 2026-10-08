@@ -2,6 +2,11 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { bookSession, fetchMySessions, updateSession } from "../api/sessionApi";
 import { getErrorMessage } from "../api/axios";
 
+const toPayload = (e) => ({
+  message: getErrorMessage(e),
+  status: e?.response?.status ?? null,
+});
+
 const initialState = { items: [], status: "idle", error: "" };
 
 export const loadSessions = createAsyncThunk(
@@ -24,7 +29,7 @@ export const bookNewSession = createAsyncThunk(
       await bookSession(payload); // { providerId, skillId, sessionTime }
       await dispatch(loadSessions());
     } catch (e) {
-      return rejectWithValue(getErrorMessage(e));
+      return rejectWithValue(toPayload(e));
     }
   },
 );
@@ -36,7 +41,7 @@ export const changeSessionStatus = createAsyncThunk(
       await updateSession(id, status); // ACCEPTED | REJECTED | COMPLETED | CANCELLED
       await dispatch(loadSessions());
     } catch (e) {
-      return rejectWithValue(getErrorMessage(e));
+      return rejectWithValue(toPayload(e));
     }
   },
 );
@@ -50,7 +55,7 @@ const sessionsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(loadSessions.pending, (s) => {
-        s.status = "loading";
+        if (s.status !== "succeeded") s.status = "loading"; // background refreshes stay "succeeded"
         s.error = "";
       })
       .addCase(loadSessions.fulfilled, (s, a) => {

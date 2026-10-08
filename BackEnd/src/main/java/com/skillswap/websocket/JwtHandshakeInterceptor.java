@@ -35,12 +35,15 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     private final UserRepository userRepository;
 
     public JwtHandshakeInterceptor(JwtService jwtService, CustomUserDetailsService userDetailsService,
-                                   UserRepository userRepository) {
+            UserRepository userRepository) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
     }
 
+    //Who is connecting?
+    //Is their JWT valid?
+    //Should I allow them?
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler handler, Map<String, Object> attributes) {

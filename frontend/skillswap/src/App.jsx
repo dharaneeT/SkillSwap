@@ -9,6 +9,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
 import AdminPage from "./pages/AdminPage";
 import SkillsListPage from "./pages/SkillsListPage";
+import MatchesPage from "./pages/MatchesPage";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/skills" element={<SkillsListPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:userId" element={<ChatPage />} />
+          <Route path="/matches" element={<MatchesPage />} />
         </Route>
 
         {/* admins only */}

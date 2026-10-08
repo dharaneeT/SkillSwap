@@ -1,97 +1,77 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchMe, fetchUserById } from "../api/userApi";
 import { fetchConversation, fetchPartners, sendMessage } from "../api/chatApi";
 import { getErrorMessage } from "../api/axios";
+import { useFetch } from "../hooks/useFetch";
+import { useChatSocket } from "../hooks/useChatSocket";
 
 export default function ChatPage() {
   const { userId } = useParams(); // undefined on /chat
   const navigate = useNavigate();
   const activeId = userId ? Number(userId) : null;
 
-  const [me, setMe] = useState(null);
-  const [partners, setPartners] = useState([]);
-  const [messages, setMessages] = useState([]);
+  const { data: me } = useFetch(fetchMe);
+  const { data: partnersData, refetch: refetchPartners } =
+    useFetch(fetchPartners);
+  const partners = partnersData ?? [];
+  const known = partners.some((p) => p.id === activeId);
+
+  // /chat/:id for someone we've never messaged → look up their name
+  const { data: urlUser } = useFetch(fetchUserById, activeId, {
+    enabled: Boolean(activeId) && partnersData !== null && !known,
+  });
+  const {
+    data: history,
+    error: historyError,
+    refetch: refetchHistory,
+  } = useFetch(fetchConversation, activeId, { enabled: Boolean(activeId) });
+
+  const [live, setLive] = useState([]); // messages pushed over the socket
+  const [unread, setUnread] = useState({}); // partnerId -> count
   const [text, setText] = useState("");
   const [error, setError] = useState("");
-  //note Used for auto-scrolling.
   const bottomRef = useRef(null);
-  //note Stores WebSocket instance.
-  const wsRef = useRef(null);
-  //note Stores current conversation ID without forcing WebSocket effect to reconnect.
-  const activeRef = useRef(null);
 
-  useEffect(() => {
-    activeRef.current = activeId;
-  }, [activeId]);
+  const { status, send } = useChatSocket((msg) => {
+    if (msg.error) {
+      setError(msg.error);
+      return;
+    }
+    setLive((prev) => [...prev, msg]);
 
-  // 1) who am I + who have I talked to (+ the person in the URL if it's a new chat)
-  useEffect(() => {
-    let ignore = false;
-    (async () => {
-      try {
-        const [meRes, pRes] = await Promise.all([fetchMe(), fetchPartners()]);
-        let list = pRes.data.data;
-        if (activeId && !list.some((p) => p.id === activeId)) {
-          const u = (await fetchUserById(activeId)).data.data;
-          list = [{ id: u.id, name: u.name }, ...list];
-        }
-        if (!ignore) {
-          setMe(meRes.data.data);
-          setPartners(list);
-        }
-      } catch (e) {
-        if (!ignore) setError(getErrorMessage(e));
-      }
-    })();
-    return () => {
-      ignore = true;
-    };
-  }, [activeId]);
+    const fromMe = msg.senderId === me?.id;
+    const partnerId = fromMe ? msg.receiverId : msg.senderId;
+    if (!partners.some((p) => p.id === partnerId)) refetchPartners(); // brand-new contact
+    if (!fromMe && partnerId !== activeId) {
+      setUnread((u) => ({ ...u, [partnerId]: (u[partnerId] ?? 0) + 1 }));
+    }
+  });
 
-  // 2) history once per conversation (no more polling)
-  useEffect(() => {
-    if (!activeId) return;
-    let ignore = false;
-    fetchConversation(activeId)
-      .then((res) => !ignore && setMessages(res.data.data))
-      .catch((e) => !ignore && setError(getErrorMessage(e)));
-    return () => {
-      ignore = true;
-    };
-  }, [activeId]);
+  // history + live, de-duplicated by id, only the open conversation
+  const messages = useMemo(() => {
+    const byId = new Map();
+    for (const m of [...(history ?? []), ...live]) {
+      if (m.senderId === activeId || m.receiverId === activeId)
+        byId.set(m.id, m);
+    }
+    return [...byId.values()].sort((a, b) => a.id - b.id);
+  }, [history, live, activeId]);
 
-  // 2b) one socket for the lifetime of the page
-  useEffect(() => {
-    const token = encodeURIComponent(localStorage.getItem("token") ?? "");
-    const ws = new WebSocket(`${import.meta.env.VITE_WS_URL}?token=${token}`);
-    wsRef.current = ws;
-    ws.onmessage = (ev) => {
-      const msg = JSON.parse(ev.data);
-      if (msg.error) {
-        setError(msg.error);
-        return;
-      }
-      // only show it if it belongs to the open conversation
-      if (
-        msg.senderId !== activeRef.current &&
-        msg.receiverId !== activeRef.current
-      )
-        return;
-      setMessages((prev) =>
-        prev.some((m) => m.id === msg.id) ? prev : [...prev, msg],
-      );
-    };
-    return () => ws.close();
-  }, []);
-
-  // 3) keep the newest message in view
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const pinned =
+    !known && urlUser?.id === activeId
+      ? [{ id: urlUser.id, name: urlUser.name }]
+      : [];
+  const sidebar = [...pinned, ...partners];
+  const active = sidebar.find((p) => p.id === activeId);
+
   const openChat = (id) => {
-    setMessages([]); // don't flash the previous conversation
+    setUnread((u) => ({ ...u, [id]: 0 }));
+    setError("");
     navigate(`/chat/${id}`);
   };
 
@@ -101,44 +81,51 @@ export default function ChatPage() {
     if (!content || !activeId) return;
     setError("");
 
-    const ws = wsRef.current;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ receiverId: activeId, content }));
-      setText(""); // the saved message comes back through onmessage
+    // normal path: the saved message echoes back through the socket
+    if (send({ receiverId: activeId, content })) {
+      setText("");
       return;
     }
-
-    setText("");
+    // socket is down → fall back to REST (the other person sees it on their next load)
     try {
       await sendMessage({ receiverId: activeId, content });
-      const res = await fetchConversation(activeId);
-      setMessages(res.data.data);
+      setText("");
+      refetchHistory();
     } catch (err) {
       setError(getErrorMessage(err));
-      setText(content);
     }
   };
-
-  const active = partners.find((p) => p.id === activeId);
 
   return (
     <main className="max-w-4xl mx-auto px-4 pt-6 flex gap-4 h-[calc(100vh-90px)]">
       <aside className="w-1/3 rounded-xl bg-slate-800 border border-slate-700 overflow-y-auto">
-        <h2 className="p-3 font-semibold border-b border-slate-700">Chats</h2>
-        {partners.length === 0 && (
+        <div className="p-3 border-b border-slate-700 flex items-center justify-between">
+          <h2 className="font-semibold">Chats</h2>
+          <span
+            className={`text-xs ${status === "open" ? "text-green-400" : "text-amber-300"}`}
+          >
+            {status === "open" ? "● Live" : "● Reconnecting…"}
+          </span>
+        </div>
+        {sidebar.length === 0 && (
           <p className="p-3 text-sm text-slate-400">
-            No chats yet. Use the Chat button on a match in your dashboard.
+            No chats yet. Use the Chat button on a match.
           </p>
         )}
-        {partners.map((p) => (
+        {sidebar.map((p) => (
           <button
             key={p.id}
             onClick={() => openChat(p.id)}
-            className={`block w-full text-left px-3 py-2 cursor-pointer hover:bg-slate-700 ${
+            className={`flex w-full items-center justify-between text-left px-3 py-2 cursor-pointer hover:bg-slate-700 ${
               p.id === activeId ? "bg-slate-700" : ""
             }`}
           >
-            {p.name}
+            <span>{p.name}</span>
+            {unread[p.id] > 0 && (
+              <span className="rounded-full bg-red-500 text-[10px] font-bold px-2 py-0.5">
+                {unread[p.id]}
+              </span>
+            )}
           </button>
         ))}
       </aside>
@@ -151,9 +138,9 @@ export default function ChatPage() {
             <h2 className="p-3 font-semibold border-b border-slate-700">
               {active?.name ?? "Chat"}
             </h2>
-            {error && (
+            {(error || historyError) && (
               <p className="m-3 rounded-lg bg-red-900/50 border border-red-500 px-3 py-2 text-sm">
-                {error}
+                {error || historyError}
               </p>
             )}
 

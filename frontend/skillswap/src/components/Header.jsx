@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import NotificationCenter from "./NotificationCenter";
 
 function Header() {
   const { user, isAdmin, logout } = useAuth();
@@ -30,8 +31,15 @@ function Header() {
                 <Link to="/chat">Chat</Link>
               </li>
               <li>
+                <Link to="/matches">Matches</Link>
+              </li>
+              <li>
                 <Link to="/profile">Profile</Link>
               </li>
+              <li>
+                <NotificationCenter />
+              </li>
+              <li className="text-slate-400 text-sm">{user.email}</li>
               {isAdmin && (
                 <li>
                   <Link to="/admin" className="text-red-200">
@@ -39,7 +47,7 @@ function Header() {
                   </Link>
                 </li>
               )}
-              <li className="text-slate-400 text-sm">{user.email}</li>
+
               <li>
                 <button onClick={handleLogout} className="cursor-pointer">
                   Logout
