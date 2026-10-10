@@ -1,87 +1,55 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchMe } from "../api/userApi";
-import { useAuth } from "../hooks/useAuth";
+import {
+  fetchNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+} from "../api/notificationApi";
 import { useFetch } from "../hooks/useFetch";
 import { usePolling } from "../hooks/usePolling";
-import { loadSessions } from "../store/sessionsSlice";
 
 const POLL_MS = 15_000;
-const DAY_MS = 24 * 60 * 60 * 1000;
-const fmt = (iso) =>
-  new Date(iso).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 
-function buildNotifications(sessions, myId, now) {
-  const items = [];
-  for (const s of sessions) {
-    const asProvider = s.providerId === myId;
-    const other = asProvider ? s.learnerName : s.providerName;
-    const when = fmt(s.sessionTime);
-    const add = (prefix, text) =>
-      items.push({ id: `${prefix}-${s.id}`, sort: s.id, text });
+const linkFor = (n) => {
+  if (n.type === "REVIEW_RECEIVED") return "/profile";
+  if (n.type === "CHAT_MESSAGE") return `/chat/${n.fromUserId}`;
+  return "/dashboard";
+};
 
-    if (asProvider && s.status === "PENDING")
-      add("req", `${other} requested ${s.skillName} on ${when}`);
-    if (!asProvider && s.status === "ACCEPTED")
-      add("acc", `${other} accepted your ${s.skillName} session (${when})`);
-    if (!asProvider && s.status === "REJECTED")
-      add("rej", `${other} declined your ${s.skillName} request`);
-    if (!asProvider && s.status === "COMPLETED" && !s.reviewed)
-      add("rev", `How was ${s.skillName} with ${other}? Leave a review`);
-
-    const start = new Date(s.sessionTime).getTime();
-    if (s.status === "ACCEPTED" && start > now && start - now < DAY_MS)
-      add("soon", `Reminder: ${s.skillName} with ${other} on ${when}`);
-  }
-  return items.sort((a, b) => b.sort - a.sort); // newest sessions first
+function timeAgo(iso) {
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
 }
 
 export default function NotificationCenter() {
-  const dispatch = useDispatch();
-  const { user } = useAuth();
-  const sessions = useSelector((s) => s.sessions.items);
-  const { data: me } = useFetch(fetchMe);
+  const { data, refetch } = useFetch(fetchNotifications);
+  const items = data?.items ?? [];
+  const unreadCount = data?.unreadCount ?? 0;
 
-  const storageKey = `skillswap:seen:${user?.email}`;
-  const [seen, setSeen] = useState(() => {
-    try {
-      return new Set(JSON.parse(localStorage.getItem(storageKey)) ?? []);
-    } catch {
-      return new Set();
-    }
-  });
-  const [now, setNow] = useState(() => Date.now());
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
 
-  // initial load + poll every 15s (paused while the tab is hidden)
-  useEffect(() => {
-    dispatch(loadSessions());
-  }, [dispatch]);
-  usePolling(() => {
-    dispatch(loadSessions());
-    setNow(Date.now());
-  }, POLL_MS);
+  usePolling(refetch, POLL_MS);
 
-  const items = useMemo(
-    () => (me ? buildNotifications(sessions, me.id, now) : []),
-    [sessions, me, now],
-  );
-  const unreadCount = items.filter((n) => !seen.has(n.id)).length;
-
-  const persist = (set) => {
-    setSeen(set);
+  const markRead = async (id) => {
     try {
-      localStorage.setItem(storageKey, JSON.stringify([...set]));
-    } catch {
-      /* storage blocked: read-state just won't persist */
+      await markNotificationRead(id);
+    } finally {
+      refetch();
     }
   };
-  const markRead = (id) => persist(new Set(seen).add(id));
-  const markAllRead = () => persist(new Set(items.map((n) => n.id))); // also prunes old ids
+  const markAllRead = async () => {
+    try {
+      await markAllNotificationsRead();
+    } finally {
+      refetch();
+    }
+  };
 
-  // close on outside click / Escape
   useEffect(() => {
     if (!open) return;
     const onDown = (e) => {
@@ -99,7 +67,10 @@ export default function NotificationCenter() {
   return (
     <div ref={rootRef} className="relative">
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          setOpen((o) => !o);
+          if (!open) refetch();
+        }}
         aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`}
         aria-expanded={open}
         className="relative cursor-pointer"
@@ -142,28 +113,28 @@ export default function NotificationCenter() {
             <p className="p-4 text-sm text-slate-400">You're all caught up.</p>
           ) : (
             <ul>
-              {items.map((n) => {
-                const isNew = !seen.has(n.id);
-                return (
-                  <li key={n.id}>
-                    <Link
-                      to="/dashboard"
-                      onClick={() => {
-                        markRead(n.id);
-                        setOpen(false);
-                      }}
-                      className={`block px-3 py-2 text-sm hover:bg-slate-700 ${
-                        isNew ? "bg-slate-700/50" : "text-slate-400"
-                      }`}
-                    >
-                      {isNew && (
-                        <span className="inline-block w-2 h-2 rounded-full bg-red-400 mr-2" />
-                      )}
-                      {n.text}
-                    </Link>
-                  </li>
-                );
-              })}
+              {items.map((n) => (
+                <li key={n.id}>
+                  <Link
+                    to={linkFor(n)}
+                    onClick={() => {
+                      if (!n.seen) markRead(n.id);
+                      setOpen(false);
+                    }}
+                    className={`block px-3 py-2 text-sm hover:bg-slate-700 ${
+                      n.seen ? "text-slate-400" : "bg-slate-700/50"
+                    }`}
+                  >
+                    {!n.seen && (
+                      <span className="inline-block w-2 h-2 rounded-full bg-red-400 mr-2" />
+                    )}
+                    {n.message}
+                    <span className="block text-xs text-slate-500 mt-0.5">
+                      {timeAgo(n.createdAt)}
+                    </span>
+                  </Link>
+                </li>
+              ))}
             </ul>
           )}
         </div>

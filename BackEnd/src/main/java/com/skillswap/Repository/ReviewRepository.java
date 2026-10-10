@@ -21,6 +21,9 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 		Long getTotal();
 	}
 
+	// reviews WRITTEN by a learner
+	Page<Review> findBySession_Learner_Id(Integer learnerId, Pageable pageable);
+
 	@Query("SELECT AVG(r.rating) AS average, COUNT(r) AS total FROM Review r WHERE r.session.provider.id = :providerId")
 	RatingStats statsForProvider(@Param("providerId") Integer providerId);
 

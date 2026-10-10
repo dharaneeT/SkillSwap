@@ -3,6 +3,7 @@ package com.skillSwap.Service;
 import com.skillSwap.Dto.user.UserResponseDTO;
 import com.skillSwap.Entity.Role;
 import com.skillSwap.Entity.User;
+import com.skillSwap.Exception.DuplicateResourceException;
 import com.skillSwap.Exception.SkillNotFoundException;
 import com.skillSwap.Exception.UserNotFoundException;
 import com.skillSwap.Repository.SkillRepository;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,10 +59,15 @@ public class AdminService {
 		target.setRole(role);
 	}
 
-    @CacheEvict(cacheNames = "skillSearch", allEntries = true)
+	@CacheEvict(cacheNames = "skillSearch", allEntries = true)
 	@Transactional
 	public void deleteSkill(Integer skillId) {
 		if (!skillRepository.existsById(skillId)) throw new SkillNotFoundException(skillId);
-		skillRepository.deleteById(skillId);
+		try {
+			skillRepository.deleteById(skillId);
+			skillRepository.flush(); // force the FK check now so we can catch it
+		} catch (DataIntegrityViolationException e) {
+			throw new DuplicateResourceException("This skill is in use by users or sessions and cannot be deleted");
+		}
 	}
 }

@@ -29,6 +29,17 @@ public class ReviewController {
 			.body(new ApiResponse<>(true, "Review added", reviewService.addReview(dto)));
 	}
 
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<PageResponse<ReviewResponseDTO>>> mine(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        if (page < 0 || size < 1 || size > 50) throw new IllegalArgumentException(
+                "page must be >= 0 and size between 1 and 50"
+        );
+        return ResponseEntity.ok(new ApiResponse<>(true, "My reviews", reviewService.reviewsByMe(page, size)));
+    }
+
 	// reviews RECEIVED by a provider, newest first
 	@GetMapping("/user/{userId}")
 	public ResponseEntity<ApiResponse<PageResponse<ReviewResponseDTO>>> forUser(

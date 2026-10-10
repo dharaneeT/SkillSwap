@@ -16,15 +16,18 @@ public class ChatService {
 	private final MessageRepository messageRepository;
 	private final UserService userService;
 	private final CurrentUserService currentUserService;
+	private final NotificationService notifications;    
 
 	public ChatService(
 		MessageRepository messageRepository,
 		UserService userService,
-		CurrentUserService currentUserService
+			CurrentUserService currentUserService,
+		NotificationService notifications 
 	) {
 		this.messageRepository = messageRepository;
 		this.userService = userService;
 		this.currentUserService = currentUserService;
+		this.notifications = notifications;
 	}
 
 	public MessageResponseDTO send(MessageRequestDTO dto) { // REST path (unchanged behaviour)
@@ -32,20 +35,27 @@ public class ChatService {
 	}
 
 	@Transactional
-	public MessageResponseDTO send(Integer senderId, MessageRequestDTO dto) { // WebSocket path
-		if (senderId.equals(dto.getReceiverId())) {
-			throw new IllegalArgumentException("You cannot message yourself");
-		}
-		User sender = userService.getUserEntityById(senderId);
-		User receiver = userService.getUserEntityById(dto.getReceiverId());
+public MessageResponseDTO send(Integer senderId, MessageRequestDTO dto) {
+    // WebSocket path
+    if (senderId.equals(dto.getReceiverId())) {
+        throw new IllegalArgumentException("You cannot message yourself");
+    }
 
-		Message m = new Message();
-		m.setSender(sender);
-		m.setReceiver(receiver);
-		m.setContent(dto.getContent().trim());
-		m.setSentAt(LocalDateTime.now());
-		return toDto(messageRepository.save(m));
-	}
+    User sender = userService.getUserEntityById(senderId);
+    User receiver = userService.getUserEntityById(dto.getReceiverId());
+
+    Message m = new Message();
+    m.setSender(sender);
+    m.setReceiver(receiver);
+    m.setContent(dto.getContent().trim());
+    m.setSentAt(LocalDateTime.now());
+
+    Message saved = messageRepository.save(m);
+
+    notifications.notifyChat(receiver, sender, saved.getContent());
+
+    return toDto(saved);
+}
 
 	public List<MessageResponseDTO> conversation(Integer otherUserId) {
 		User me = currentUserService.getCurrentUser();

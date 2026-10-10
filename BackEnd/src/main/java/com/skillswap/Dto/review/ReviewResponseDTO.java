@@ -14,4 +14,6 @@ public class ReviewResponseDTO {
 	private int rating;
 	private String comment;
 	private LocalDateTime createdAt;
+	private String providerName;
+	private String skillName;
 }

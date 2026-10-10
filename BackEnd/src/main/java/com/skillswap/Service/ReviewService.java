@@ -28,17 +28,20 @@ public class ReviewService {
 	private final SessionRepository sessionRepository;
 	private final UserRepository userRepository;
 	private final CurrentUserService currentUserService;
+	private final NotificationService notifications;
 
 	public ReviewService(
 		ReviewRepository reviewRepository,
 		SessionRepository sessionRepository,
 		UserRepository userRepository,
-		CurrentUserService currentUserService
+		CurrentUserService currentUserService,
+		NotificationService notifications
 	) {
 		this.reviewRepository = reviewRepository;
 		this.sessionRepository = sessionRepository;
 		this.userRepository = userRepository;
 		this.currentUserService = currentUserService;
+		this.notifications = notifications;
 	}
 
 	@Transactional(isolation = Isolation.READ_COMMITTED)
@@ -46,35 +49,49 @@ public class ReviewService {
 	public ReviewResponseDTO addReview(ReviewRequestDTO dto) {
 		User me = currentUserService.getCurrentUser();
 
-		// row lock: two simultaneous submits for one session can't both pass the checks below
+		// Row lock prevents simultaneous submissions for the same session.
 		Session session = sessionRepository
 			.findByIdForUpdate(dto.getSessionId())
 			.orElseThrow(() -> new SessionNotFoundException(dto.getSessionId()));
 
-		if (!session.getLearner().getId().equals(me.getId())) throw new AccessDeniedException(
-			"Only the learner of this session can review it"
-		);
-		if (session.getStatus() != SessionStatus.COMPLETED) throw new InvalidSessionStateException(
-			"You can only review a completed session"
-		);
-		if (reviewRepository.existsBySession_Id(session.getId())) throw new DuplicateResourceException(
-			"This session has already been reviewed"
-		);
+		if (!session.getLearner().getId().equals(me.getId())) {
+			throw new AccessDeniedException("Only the learner of this session can review it");
+		}
+
+		if (session.getStatus() != SessionStatus.COMPLETED) {
+			throw new InvalidSessionStateException("You can only review a completed session");
+		}
+
+		if (reviewRepository.existsBySession_Id(session.getId())) {
+			throw new DuplicateResourceException("This session has already been reviewed");
+		}
 
 		Review review = new Review();
 		review.setSession(session);
 		review.setRating(dto.getRating());
 		review.setComment(dto.getComment() == null ? null : dto.getComment().trim());
 		review.setCreatedAt(LocalDateTime.now());
+
 		Review saved = reviewRepository.save(review);
 
 		refreshProviderRating(session.getProvider().getId());
+
+		notifications.notify(
+			session.getProvider(),
+			NotificationType.REVIEW_RECEIVED,
+			me.getName() + " left you a " + saved.getRating() + "-star review",
+			session.getId()
+		);
+
 		return toDto(saved);
 	}
 
 	@Transactional(readOnly = true)
 	public PageResponse<ReviewResponseDTO> reviewsForUser(Integer userId, int page, int size) {
-		if (!userRepository.existsById(userId)) throw new UserNotFoundException(userId);
+		if (!userRepository.existsById(userId)) {
+			throw new UserNotFoundException(userId);
+		}
+
 		return PageResponse.of(
 			reviewRepository
 				.findBySession_Provider_Id(userId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")))
@@ -82,12 +99,28 @@ public class ReviewService {
 		);
 	}
 
-	// recompute from the source of truth; the provider row lock serializes concurrent updates
+	@Transactional(readOnly = true)
+	public PageResponse<ReviewResponseDTO> reviewsByMe(int page, int size) {
+		Integer me = currentUserService.getCurrentUser().getId();
+
+		return PageResponse.of(
+			reviewRepository
+				.findBySession_Learner_Id(me, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")))
+				.map(this::toDto)
+		);
+	}
+
+	// Recompute the rating from the source of truth.
+	// The provider row lock serializes concurrent updates.
 	private void refreshProviderRating(Integer providerId) {
 		userRepository.findByIdForUpdate(providerId);
+
 		ReviewRepository.RatingStats stats = reviewRepository.statsForProvider(providerId);
+
 		double avg = stats.getAverage() == null ? 0.0 : Math.round(stats.getAverage() * 100.0) / 100.0;
+
 		int total = stats.getTotal() == null ? 0 : stats.getTotal().intValue();
+
 		userRepository.updateRating(providerId, avg, total);
 	}
 
@@ -98,7 +131,9 @@ public class ReviewService {
 			r.getSession().getLearner().getName(),
 			r.getRating(),
 			r.getComment(),
-			r.getCreatedAt()
+			r.getCreatedAt(),
+			r.getSession().getProvider().getName(),
+			r.getSession().getSkill() != null ? r.getSession().getSkill().getName() : null
 		);
 	}
 }

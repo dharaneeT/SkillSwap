@@ -4,6 +4,7 @@ import { fetchMe, fetchUserById } from "../api/userApi";
 import { fetchConversation, fetchPartners, sendMessage } from "../api/chatApi";
 import { getErrorMessage } from "../api/axios";
 import { useFetch } from "../hooks/useFetch";
+import { markChatRead } from "../api/notificationApi";
 import { useChatSocket } from "../hooks/useChatSocket";
 
 export default function ChatPage() {
@@ -42,6 +43,8 @@ export default function ChatPage() {
 
     const fromMe = msg.senderId === me?.id;
     const partnerId = fromMe ? msg.receiverId : msg.senderId;
+    if (!fromMe && partnerId === activeId)
+      markChatRead(partnerId).catch(() => {});
     if (!partners.some((p) => p.id === partnerId)) refetchPartners(); // brand-new contact
     if (!fromMe && partnerId !== activeId) {
       setUnread((u) => ({ ...u, [partnerId]: (u[partnerId] ?? 0) + 1 }));
@@ -61,6 +64,11 @@ export default function ChatPage() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // opening a chat clears that person's bell notification
+  useEffect(() => {
+    if (activeId) markChatRead(activeId).catch(() => {});
+  }, [activeId]);
 
   const pinned =
     !known && urlUser?.id === activeId
