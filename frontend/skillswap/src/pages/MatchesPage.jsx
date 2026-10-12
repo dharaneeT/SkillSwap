@@ -6,6 +6,7 @@ import { fetchMatches } from "../api/matchApi";
 import { useFetch } from "../hooks/useFetch";
 import { loadSkills } from "../store/skillsSlice";
 import BookingModal from "../components/BookingModal";
+import Icon from "../components/Icon";
 
 function rankMatches(rows) {
   const byUser = new Map();
@@ -28,8 +29,7 @@ function rankMatches(rows) {
     .map((m, i) => ({ ...m, rank: i + 1 })); // rank is fixed before filtering
 }
 
-const inputClass =
-  "rounded-lg bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-red-200";
+const inputClass = "input select";
 
 export default function MatchesPage() {
   const dispatch = useDispatch();
@@ -106,34 +106,47 @@ export default function MatchesPage() {
   const loading = !rows && !error;
 
   return (
-    <main className="max-w-4xl mx-auto px-4 pt-6 pb-10">
-      <h1 className="text-2xl font-bold">Your matches</h1>
-      <p className="text-sm text-slate-400">
-        People who offer skills you want to learn, best match first.
-      </p>
+    <main className="page max-w-5xl">
+      <div className="space-y-2">
+        <p className="eyebrow">Matches</p>
+        <h1 className="page-title">Your matches</h1>
+        <p className="page-sub">
+          People who offer skills you want to learn, best match first.
+        </p>
+      </div>
 
       {error && (
-        <p className="mt-4 rounded-lg bg-red-900/50 border border-red-500 px-3 py-2 text-sm">
-          {error}
+        <p role="alert" className="alert alert-error mt-6">
+          <Icon name="alert-circle" size={18} className="mt-0.5" />
+          <span>{error}</span>
         </p>
       )}
       {notice && (
-        <p className="mt-4 rounded-lg bg-slate-700 px-3 py-2 text-sm">
-          {notice}
+        <p role="status" className="alert alert-info mt-6">
+          <Icon name="circle-check" size={18} className="mt-0.5" />
+          <span>{notice}</span>
         </p>
       )}
 
       {/* live filters */}
-      <section className="mt-4 rounded-xl bg-slate-800 border border-slate-700 p-4 space-y-3">
-        <div className="flex flex-wrap gap-2">
-          <input
-            className={`${inputClass} flex-1 min-w-48`}
-            placeholder="Search by name or skill..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      <section
+        aria-label="Filters"
+        className="card card-lavender mt-8 space-y-4"
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative min-w-52 flex-1">
+            <Icon name="search" size={17} className="input-icon" />
+            <input
+              className="input input-with-icon"
+              placeholder="Search by name or skill..."
+              aria-label="Search by name or skill"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
           <select
             className={inputClass}
+            aria-label="Minimum matching skills"
             value={minSkills}
             onChange={(e) => setMinSkills(Number(e.target.value))}
           >
@@ -143,6 +156,7 @@ export default function MatchesPage() {
           </select>
           <select
             className={inputClass}
+            aria-label="Sort"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
           >
@@ -158,12 +172,11 @@ export default function MatchesPage() {
                 key={name}
                 onClick={() => togglePicked(name)}
                 aria-pressed={picked.includes(name)}
-                className={`rounded-full px-3 py-1 text-xs cursor-pointer border ${
-                  picked.includes(name)
-                    ? "bg-red-200 text-slate-900 border-red-200"
-                    : "border-slate-600 hover:bg-slate-700"
-                }`}
+                className="chip"
               >
+                {picked.includes(name) && (
+                  <Icon name="check" size={13} strokeWidth={3} />
+                )}
                 {name}
               </button>
             ))}
@@ -171,12 +184,12 @@ export default function MatchesPage() {
         )}
       </section>
 
-      {loading && <p className="mt-6 text-slate-400">Loading matches...</p>}
+      {loading && <p className="mt-8 text-muted">Loading matches...</p>}
 
       {!loading && ranked.length === 0 && !error && (
-        <p className="mt-6 text-slate-400">
+        <p className="card mt-8 flex flex-wrap items-center gap-x-1 text-sm text-muted">
           No matches yet. Add skills you want to learn on your{" "}
-          <Link to="/profile" className="text-red-200 underline">
+          <Link to="/profile" className="link">
             profile
           </Link>
           .
@@ -184,33 +197,31 @@ export default function MatchesPage() {
       )}
 
       {ranked.length > 0 && (
-        <p className="mt-4 text-sm text-slate-400">
+        <p className="meta mt-6 flex items-center gap-2">
           Showing {visible.length} of {ranked.length}
           {visible.length === 0 && (
             <button
               onClick={clearFilters}
-              className="ml-2 text-red-200 underline cursor-pointer"
+              className="link inline-flex items-center gap-1"
             >
+              <Icon name="x" size={13} />
               Clear filters
             </button>
           )}
         </p>
       )}
 
-      <ul className="mt-3 space-y-3">
+      <ul className="mt-4 space-y-3">
         {visible.map((m) => (
-          <li
-            key={m.userId}
-            className="rounded-xl bg-slate-800 border border-slate-700 p-4"
-          >
+          <li key={m.userId} className="card card-white">
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <span className="rounded-full bg-red-200 text-slate-900 text-xs font-bold px-2 py-1">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-11 min-w-11 items-center justify-center rounded-full bg-lavender px-2 text-sm font-bold">
                   #{m.rank}
                 </span>
-                <div>
-                  <p className="font-semibold">{m.userName}</p>
-                  <p className="text-xs text-slate-400">
+                <div className="min-w-0">
+                  <p className="card-title truncate">{m.userName}</p>
+                  <p className="meta">
                     Offers {m.skills.length} skill
                     {m.skills.length > 1 ? "s" : ""} you want
                   </p>
@@ -218,20 +229,22 @@ export default function MatchesPage() {
               </div>
               <Link
                 to={`/chat/${m.userId}`}
-                className="rounded-lg border border-slate-600 px-3 py-1 text-sm hover:bg-slate-700"
+                className="btn btn-secondary btn-sm shrink-0"
               >
+                <Icon name="message-circle" size={15} />
                 Chat
               </Link>
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               {m.skills.map((name) => (
                 <button
                   key={name}
                   onClick={() => startBooking(m, name)}
-                  className="rounded-lg bg-slate-700 hover:bg-slate-600 px-3 py-1 text-sm cursor-pointer"
+                  className="btn btn-tint btn-sm"
                   title={`Book ${name} with ${m.userName}`}
                 >
+                  <Icon name="calendar" size={14} />
                   Book {name}
                 </button>
               ))}

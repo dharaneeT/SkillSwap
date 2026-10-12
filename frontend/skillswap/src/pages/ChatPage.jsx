@@ -6,6 +6,7 @@ import { getErrorMessage } from "../api/axios";
 import { useFetch } from "../hooks/useFetch";
 import { markChatRead } from "../api/notificationApi";
 import { useChatSocket } from "../hooks/useChatSocket";
+import Icon from "../components/Icon";
 
 export default function ChatPage() {
   const { userId } = useParams(); // undefined on /chat
@@ -105,54 +106,80 @@ export default function ChatPage() {
   };
 
   return (
-    <main className="max-w-4xl mx-auto px-4 pt-6 flex gap-4 h-[calc(100vh-90px)]">
-      <aside className="w-1/3 rounded-xl bg-slate-800 border border-slate-700 overflow-y-auto">
-        <div className="p-3 border-b border-slate-700 flex items-center justify-between">
-          <h2 className="font-semibold">Chats</h2>
+    <main className="mx-auto flex h-[calc(100dvh-5.5rem)] w-full max-w-5xl flex-col gap-4 px-3 pb-4 pt-2 sm:px-6 md:flex-row">
+      <aside className="flex max-h-48 shrink-0 flex-col overflow-hidden rounded-[1.75rem] bg-surface md:max-h-none md:w-1/3">
+        <div className="flex items-center justify-between px-5 py-4">
+          <h2 className="flex items-center gap-2 font-bold">
+            <Icon name="message-circle" size={18} />
+            Chats
+          </h2>
           <span
-            className={`text-xs ${status === "open" ? "text-green-400" : "text-amber-300"}`}
-          >
-            {status === "open" ? "● Live" : "● Reconnecting…"}
-          </span>
-        </div>
-        {sidebar.length === 0 && (
-          <p className="p-3 text-sm text-slate-400">
-            No chats yet. Use the Chat button on a match.
-          </p>
-        )}
-        {sidebar.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => openChat(p.id)}
-            className={`flex w-full items-center justify-between text-left px-3 py-2 cursor-pointer hover:bg-slate-700 ${
-              p.id === activeId ? "bg-slate-700" : ""
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
+              status === "open"
+                ? "bg-[#d9f2e3] text-[#17623a]"
+                : "bg-[#fff4dd] text-[#7a5200]"
             }`}
           >
-            <span>{p.name}</span>
-            {unread[p.id] > 0 && (
-              <span className="rounded-full bg-red-500 text-[10px] font-bold px-2 py-0.5">
-                {unread[p.id]}
+            <span className="live-dot" />
+            {status === "open" ? "Live" : "Reconnecting…"}
+          </span>
+        </div>
+        <div className="flex-1 overflow-y-auto px-2 pb-2">
+          {sidebar.length === 0 && (
+            <p className="px-3 py-2 text-sm text-muted">
+              No chats yet. Use the Chat button on a match.
+            </p>
+          )}
+          {sidebar.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => openChat(p.id)}
+              className={`flex w-full items-center justify-between gap-3 rounded-full px-3 py-2 text-left text-sm font-medium transition-colors ${
+                p.id === activeId
+                  ? "bg-periwinkle text-navy"
+                  : "hover:bg-white"
+              }`}
+            >
+              <span className="flex min-w-0 items-center gap-2.5">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lavender text-xs font-bold uppercase">
+                  {p.name?.[0] ?? <Icon name="user" size={14} />}
+                </span>
+                <span className="truncate">{p.name}</span>
               </span>
-            )}
-          </button>
-        ))}
+              {unread[p.id] > 0 && (
+                <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">
+                  {unread[p.id]}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
       </aside>
 
-      <section className="flex-1 flex flex-col rounded-xl bg-slate-800 border border-slate-700">
+      <section className="card card-white flex min-h-0 flex-1 flex-col overflow-hidden p-0 sm:p-0">
         {!activeId ? (
-          <p className="m-auto text-slate-400">Select a conversation</p>
+          <div className="m-auto flex flex-col items-center gap-3 p-6 text-center text-muted">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-lavender text-ink">
+              <Icon name="message-circle" size={24} />
+            </span>
+            <p>Select a conversation</p>
+          </div>
         ) : (
           <>
-            <h2 className="p-3 font-semibold border-b border-slate-700">
+            <h2 className="flex items-center gap-3 border-b border-line px-5 py-4 font-bold">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-lavender text-sm font-bold uppercase">
+                {active?.name?.[0] ?? <Icon name="user" size={16} />}
+              </span>
               {active?.name ?? "Chat"}
             </h2>
             {(error || historyError) && (
-              <p className="m-3 rounded-lg bg-red-900/50 border border-red-500 px-3 py-2 text-sm">
-                {error || historyError}
+              <p role="alert" className="alert alert-error m-3">
+                <Icon name="alert-circle" size={18} className="mt-0.5" />
+                <span>{error || historyError}</span>
               </p>
             )}
 
-            <ul className="flex-1 overflow-y-auto p-3 space-y-2">
+            <ul className="flex-1 space-y-2 overflow-y-auto bg-cream p-4">
               {messages.map((m) => {
                 const mine = m.senderId === me?.id;
                 return (
@@ -161,12 +188,14 @@ export default function ChatPage() {
                     className={`flex ${mine ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${
-                        mine ? "bg-red-200 text-slate-900" : "bg-slate-700"
+                      className={`max-w-[80%] rounded-3xl px-4 py-2.5 text-sm ${
+                        mine
+                          ? "rounded-br-lg bg-brand text-white"
+                          : "rounded-bl-lg bg-surface text-ink"
                       }`}
                     >
                       <p className="wrap-break-word">{m.content}</p>
-                      <p className="text-[10px] opacity-60 mt-1">
+                      <p className="mt-1 text-[10px] opacity-70">
                         {new Date(m.sentAt).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -181,17 +210,19 @@ export default function ChatPage() {
 
             <form
               onSubmit={handleSend}
-              className="p-3 flex gap-2 border-t border-slate-700"
+              className="flex gap-2 border-t border-line p-3"
             >
               <input
-                className="flex-1 rounded-lg bg-slate-900 border border-slate-600 px-3 py-2 outline-none focus:border-red-200"
+                className="input"
                 placeholder="Type a message..."
+                aria-label="Message"
                 value={text}
                 maxLength={1000}
                 onChange={(e) => setText(e.target.value)}
               />
-              <button className="rounded-lg bg-red-200 text-slate-900 font-semibold px-4 cursor-pointer">
-                Send
+              <button className="btn btn-primary shrink-0">
+                <Icon name="send" size={15} />
+                <span className="max-sm:sr-only">Send</span>
               </button>
             </form>
           </>

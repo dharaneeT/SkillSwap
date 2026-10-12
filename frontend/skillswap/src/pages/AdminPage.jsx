@@ -12,18 +12,23 @@ import {
   setUserRole,
 } from "../api/adminApi";
 import { getErrorMessage } from "../api/axios";
+import Icon from "../components/Icon";
 
 // this const was missing before -> "btn is not defined" crash
-const btn =
-  "rounded-lg border border-slate-600 px-3 py-1 text-xs font-semibold cursor-pointer hover:bg-slate-700 disabled:opacity-40 disabled:cursor-default";
-const searchInput =
-  "w-full sm:w-72 rounded-lg bg-slate-800 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-red-200";
+const btn = "btn btn-secondary btn-sm";
+const searchInput = "input input-with-icon";
 
-function Stat({ label, value }) {
+// tone = one of the pastel card classes
+function Stat({ label, value, tone, icon }) {
   return (
-    <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
-      <p className="text-2xl font-bold text-red-200">{value}</p>
-      <p className="text-sm text-slate-400">{label}</p>
+    <div className={`card ${tone} flex items-start justify-between gap-3`}>
+      <div>
+        <p className="text-3xl font-extrabold leading-none tracking-tight">
+          {value}
+        </p>
+        <p className="mt-2 text-sm opacity-75">{label}</p>
+      </div>
+      <Icon name={icon} size={20} />
     </div>
   );
 }
@@ -128,51 +133,76 @@ export default function AdminPage() {
   }, [skills, skillQuery]);
 
   return (
-    <main className="max-w-5xl mx-auto px-4 pt-10 pb-16 space-y-10">
-      <h1 className="text-2xl font-bold">Admin dashboard</h1>
+    <main className="page max-w-6xl space-y-10 pb-16">
+      <div className="space-y-2">
+        <p className="eyebrow">Admin</p>
+        <h1 className="page-title">Admin dashboard</h1>
+      </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Stat label="Users" value={users.length} />
-        <Stat label="Active" value={activeCount} />
-        <Stat label="Deactivated" value={users.length - activeCount} />
-        <Stat label="Skills" value={skills.length} />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <Stat label="Users" value={users.length} tone="card-lavender" icon="users" />
+        <Stat
+          label="Active"
+          value={activeCount}
+          tone="card-periwinkle"
+          icon="circle-check"
+        />
+        <Stat
+          label="Deactivated"
+          value={users.length - activeCount}
+          tone=""
+          icon="ban"
+        />
+        <Stat
+          label="Skills"
+          value={skills.length}
+          tone="card-navy"
+          icon="book-open"
+        />
       </div>
 
       {error && (
-        <p className="rounded-lg bg-red-900/50 border border-red-500 px-3 py-2 text-sm">
-          {error}
+        <p role="alert" className="alert alert-error">
+          <Icon name="alert-circle" size={18} className="mt-0.5" />
+          <span>{error}</span>
         </p>
       )}
       {notice && !error && (
-        <p className="rounded-lg bg-green-900/40 border border-green-500 px-3 py-2 text-sm">
-          {notice}
+        <p role="status" className="alert alert-success">
+          <Icon name="circle-check" size={18} className="mt-0.5" />
+          <span>{notice}</span>
         </p>
       )}
 
       <section>
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-          <h2 className="text-xl font-semibold">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="section-title flex items-center gap-2">
+            <Icon name="users" size={20} />
             Users ({shownUsers.length}
             {userQuery ? ` of ${users.length}` : ""})
           </h2>
-          <input
-            className={searchInput}
-            placeholder="Search name or email"
-            value={userQuery}
-            onChange={(e) => setUserQuery(e.target.value)}
-          />
+          <div className="relative w-full sm:w-72">
+            <Icon name="search" size={16} className="input-icon" />
+            <input
+              className={searchInput}
+              placeholder="Search name or email"
+              aria-label="Search users by name or email"
+              value={userQuery}
+              onChange={(e) => setUserQuery(e.target.value)}
+            />
+          </div>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-700">
+        <div className="overflow-x-auto rounded-[1.75rem] border border-line bg-white">
           <table className="w-full text-sm">
-            <thead className="bg-slate-800 text-left text-slate-400">
+            <thead className="bg-surface text-left text-xs font-semibold uppercase tracking-wider text-muted">
               <tr>
-                <th className="p-3">Name</th>
-                <th className="p-3">Email</th>
-                <th className="p-3">Role</th>
-                <th className="p-3">Credits</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Actions</th>
+                <th className="p-4">Name</th>
+                <th className="p-4">Email</th>
+                <th className="p-4">Role</th>
+                <th className="p-4">Credits</th>
+                <th className="p-4">Status</th>
+                <th className="p-4">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -180,35 +210,43 @@ export default function AdminPage() {
                 const isMe = u.email === authUser.email;
                 const busy = busyKey === `user-${u.id}`;
                 return (
-                  <tr key={u.id} className="border-t border-slate-700">
-                    <td className="p-3">{u.name}</td>
-                    <td className="p-3">{u.email}</td>
-                    <td className="p-3">{u.role}</td>
-                    <td className="p-3">{u.credits}</td>
-                    <td className="p-3">
+                  <tr
+                    key={u.id}
+                    className="border-t border-line transition-colors hover:bg-cream"
+                  >
+                    <td className="p-4 font-semibold">{u.name}</td>
+                    <td className="p-4 text-muted">{u.email}</td>
+                    <td className="p-4">
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                          isInactive(u)
-                            ? "bg-red-900/60 text-red-200"
-                            : "bg-green-900/60 text-green-200"
+                        className={`badge ${
+                          u.role === "ADMIN" ? "badge-accepted" : ""
+                        }`}
+                      >
+                        {u.role}
+                      </span>
+                    </td>
+                    <td className="p-4">{u.credits}</td>
+                    <td className="p-4">
+                      <span
+                        className={`badge ${
+                          isInactive(u) ? "badge-danger" : "badge-success"
                         }`}
                       >
                         {isInactive(u) ? "Inactive" : "Active"}
                       </span>
                     </td>
-                    <td className="p-3">
+                    <td className="p-4">
                       <div className="flex flex-wrap gap-2">
                         <button
                           className={btn}
                           disabled={busy}
                           onClick={() => handleCredits(u)}
                         >
-                          + Credits
+                          <Icon name="plus" size={13} />
+                          Credits
                         </button>
                         {isMe ? (
-                          <span className="text-xs text-slate-500 self-center">
-                            You
-                          </span>
+                          <span className="meta self-center">You</span>
                         ) : (
                           <>
                             <button
@@ -216,6 +254,10 @@ export default function AdminPage() {
                               disabled={busy}
                               onClick={() => toggleActive(u)}
                             >
+                              <Icon
+                                name={isInactive(u) ? "circle-check" : "ban"}
+                                size={13}
+                              />
                               {isInactive(u) ? "Activate" : "Deactivate"}
                             </button>
                             <button
@@ -223,6 +265,7 @@ export default function AdminPage() {
                               disabled={busy}
                               onClick={() => toggleRole(u)}
                             >
+                              <Icon name="shield-check" size={13} />
                               Make {u.role === "ADMIN" ? "USER" : "ADMIN"}
                             </button>
                           </>
@@ -234,7 +277,7 @@ export default function AdminPage() {
               })}
               {shownUsers.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-4 text-slate-500">
+                  <td colSpan={6} className="p-5 text-muted">
                     No users match.
                   </td>
                 </tr>
@@ -245,37 +288,44 @@ export default function AdminPage() {
       </section>
 
       <section>
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-          <h2 className="text-xl font-semibold">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="section-title flex items-center gap-2">
+            <Icon name="book-open" size={20} />
             Skills ({shownSkills.length}
             {skillQuery ? ` of ${skills.length}` : ""})
           </h2>
-          <input
-            className={searchInput}
-            placeholder="Search skills"
-            value={skillQuery}
-            onChange={(e) => setSkillQuery(e.target.value)}
-          />
+          <div className="relative w-full sm:w-72">
+            <Icon name="search" size={16} className="input-icon" />
+            <input
+              className={searchInput}
+              placeholder="Search skills"
+              aria-label="Search skills"
+              value={skillQuery}
+              onChange={(e) => setSkillQuery(e.target.value)}
+            />
+          </div>
         </div>
-        <ul className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <ul className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 lg:grid-cols-3">
           {shownSkills.map((s) => (
             <li
               key={s.id}
-              className="rounded-xl bg-slate-800 border border-slate-700 p-3 flex justify-between items-center gap-2"
+              className="card card-white flex items-center justify-between gap-2 py-3 sm:py-3"
             >
-              <span className="truncate">{s.name}</span>
+              <span className="truncate font-medium">{s.name}</span>
               <button
                 className={btn}
                 disabled={busyKey === `skill-${s.id}`}
                 onClick={() => handleDeleteSkill(s)}
+                aria-label={`Delete ${s.name}`}
               >
+                <Icon name="trash-2" size={13} />
                 Delete
               </button>
             </li>
           ))}
         </ul>
         {shownSkills.length === 0 && (
-          <p className="text-slate-500 text-sm">No skills match.</p>
+          <p className="text-muted text-sm">No skills match.</p>
         )}
       </section>
     </main>

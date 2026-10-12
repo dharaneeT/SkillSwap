@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { bookNewSession } from "../store/sessionsSlice";
+import Icon from "./Icon";
 
 // "2026-10-07T14:30" in local time, which is what <input type="datetime-local"> expects
 function nowForInput() {
@@ -53,76 +54,97 @@ export default function BookingModal({ provider, skill, onClose, onBooked }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="booking-title"
-        className="w-full max-w-md rounded-xl bg-slate-800 border border-slate-700 p-5"
+        className="max-h-full w-full max-w-md overflow-y-auto rounded-[2rem] bg-cream p-6 shadow-xl sm:p-7"
         onClick={(e) => e.stopPropagation()} // clicks inside shouldn't close it
       >
-        <h2 id="booking-title" className="text-lg font-semibold">
-          Book {skill.name} with {provider.name}
-        </h2>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lavender">
+              <Icon name="calendar" size={19} />
+            </span>
+            <h2
+              id="booking-title"
+              className="text-xl font-bold leading-snug tracking-tight"
+            >
+              Book {skill.name} with {provider.name}
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            title="Close"
+            className="btn-icon -mr-1 -mt-1 shrink-0"
+          >
+            <Icon name="x" size={18} />
+          </button>
+        </div>
 
         {done ? (
           <>
-            <p className="mt-4 text-sm text-green-300">
-              Request sent! {provider.name} will see it in their notifications.
+            <p className="alert alert-success mt-5">
+              <Icon name="circle-check" size={18} className="mt-0.5" />
+              <span>
+                Request sent! {provider.name} will see it in their
+                notifications.
+              </span>
             </p>
-            <button
-              onClick={onClose}
-              className="mt-4 rounded-lg bg-red-200 text-slate-900 font-semibold px-4 py-2 cursor-pointer"
-            >
+            <button onClick={onClose} className="btn btn-primary mt-5">
+              <Icon name="check" size={16} />
               Done
             </button>
           </>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-            <label className="block text-sm">
-              Date and time
+          <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+            <label className="block text-sm font-medium">
+              <span className="flex items-center gap-2">
+                <Icon name="clock" size={15} />
+                Date and time
+              </span>
               <input
                 type="datetime-local"
                 autoFocus
                 min={min}
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="mt-1 w-full rounded-lg bg-slate-900 border border-slate-600 px-3 py-2 outline-none focus:border-red-200"
+                className="input mt-2"
               />
             </label>
 
             {error && (
               <div
                 role="alert"
-                className={`rounded-lg border px-3 py-2 text-sm ${
-                  conflict
-                    ? "bg-amber-900/40 border-amber-400"
-                    : "bg-red-900/50 border-red-500"
-                }`}
+                className={`alert ${conflict ? "alert-warning" : "alert-error"}`}
               >
-                <p>{error.message}</p>
-                {conflict && (
-                  <p className="mt-1 opacity-80">
-                    Choose a different time and try again.
-                  </p>
-                )}
+                <Icon name="alert-circle" size={18} className="mt-0.5" />
+                <div>
+                  <p>{error.message}</p>
+                  {conflict && (
+                    <p className="mt-1 opacity-80">
+                      Choose a different time and try again.
+                    </p>
+                  )}
+                </div>
               </div>
             )}
 
-            <div className="flex justify-end gap-2 pt-1">
+            <div className="flex flex-wrap justify-end gap-2 pt-1">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg px-4 py-2 text-sm cursor-pointer hover:bg-slate-700"
+                className="btn btn-ghost"
               >
                 Cancel
               </button>
-              <button
-                disabled={submitting}
-                className="rounded-lg bg-red-200 text-slate-900 font-semibold px-4 py-2 cursor-pointer disabled:opacity-50"
-              >
+              <button disabled={submitting} className="btn btn-primary">
+                <Icon name="send" size={15} />
                 {submitting ? "Sending..." : "Request session"}
               </button>
             </div>

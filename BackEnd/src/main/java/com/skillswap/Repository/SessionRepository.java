@@ -19,7 +19,6 @@ public interface SessionRepository extends JpaRepository<Session, Integer> {
 	@Query("SELECT s FROM Session s WHERE s.provider.id = :userId OR s.learner.id = :userId")
 	List<Session> findUserSessions(int userId);
 
-
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Query("SELECT s FROM Session s WHERE s.id = :id")
 	Optional<Session> findByIdForUpdate(@Param("id") Integer id);
@@ -61,4 +60,23 @@ public interface SessionRepository extends JpaRepository<Session, Integer> {
 		@Param("now") LocalDateTime now,
 		@Param("until") LocalDateTime until
 	);
+
+	interface TaughtCount {
+		Integer getUserId();
+		String getName();
+		Long getTaught();
+	}
+
+ @Query("""
+        SELECT s.provider.id AS userId, s.provider.name AS name, COUNT(s) AS taught
+        FROM Session s
+        WHERE s.status = :status
+        GROUP BY s.provider.id, s.provider.name
+        """)
+	List<TaughtCount> countByProviderAndStatus(@Param("status") SessionStatus status);
+	// LeaderboardService keeps calling this name, so nothing else changes
+    default List<TaughtCount> countCompletedByProvider() {
+        return countByProviderAndStatus(SessionStatus.COMPLETED);
+    }
+
 }

@@ -29,4 +29,19 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
 	@Query("SELECT r.session.id FROM Review r WHERE r.session.id IN :ids")
 	List<Integer> findReviewedSessionIds(@Param("ids") Collection<Integer> ids);
+
+	interface RatingStat {
+		Integer getUserId();
+		Double getAvgRating();
+		Long getReviewCount();
+	}
+
+	@Query(
+		"""
+        SELECT r.session.provider.id AS userId, AVG(r.rating) AS avgRating, COUNT(r) AS reviewCount
+        FROM Review r
+        GROUP BY r.session.provider.id
+        """
+	)
+	List<RatingStat> ratingStatsByProvider();
 }

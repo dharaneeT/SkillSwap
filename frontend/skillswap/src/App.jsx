@@ -9,11 +9,12 @@ import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
 import AdminPage from "./pages/AdminPage";
 import SkillsListPage from "./pages/SkillsListPage";
+import LeaderboardPage from "./pages/LeaderboardPage";
 import MatchesPage from "./pages/MatchesPage";
 
 function App() {
   return (
-    <div className="montserrat min-h-screen text-white bg-slate-900">
+    <div className="min-h-screen bg-cream font-sans text-ink">
       <Header />
       <Routes>
         {/* public */}
@@ -29,6 +30,7 @@ function App() {
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:userId" element={<ChatPage />} />
           <Route path="/matches" element={<MatchesPage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
         </Route>
 
         {/* admins only */}

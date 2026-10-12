@@ -6,9 +6,19 @@ import { addReview } from "../api/reviewApi";
 import { getErrorMessage } from "../api/axios";
 import { useFetch } from "../hooks/useFetch";
 import { changeSessionStatus, loadSessions } from "../store/sessionsSlice";
+import Icon from "../components/Icon";
 
-const card = "rounded-xl bg-slate-800 border border-slate-700 p-4";
-const btn = "rounded-lg px-3 py-1 text-sm font-semibold cursor-pointer";
+const card = "card card-white";
+const btn = "btn btn-sm";
+
+// presentational only: maps a session status to a badge colour
+const badgeClass = (status) => {
+  if (["PENDING", "REQUESTED"].includes(status)) return "badge badge-pending";
+  if (status === "ACCEPTED") return "badge badge-accepted";
+  if (status === "COMPLETED") return "badge badge-completed";
+  if (["REJECTED", "CANCELLED"].includes(status)) return "badge badge-danger";
+  return "badge";
+};
 
 // .unwrap() throws the rejectWithValue string; axios errors need getErrorMessage
 const errMsg = (e) => (typeof e === "string" ? e : getErrorMessage(e));
@@ -83,31 +93,72 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="max-w-4xl mx-auto px-4 pt-10 space-y-10">
-      <header className="flex justify-between items-end">
-        <h1 className="text-2xl font-bold">Hi {me?.name}</h1>
+    <main className="page max-w-5xl space-y-10">
+      <header className="grid gap-4 md:grid-cols-[1fr_auto] md:items-stretch">
+        <div className="flex flex-col justify-center gap-2">
+          <p className="eyebrow">Dashboard</p>
+          <h1 className="page-title">Hi {me?.name}</h1>
+        </div>
 
-        <p>
-          <span className="text-3xl font-bold text-red-200">{me?.credits}</span>{" "}
-          credits
-        </p>
+        <div className="card card-navy flex min-w-56 items-center justify-between gap-6">
+          <div>
+            <p className="text-4xl font-extrabold leading-none tracking-tight">
+              {me?.credits}
+            </p>
+            <p className="mt-1 text-sm text-white/75">credits</p>
+          </div>
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15">
+            <Icon name="coins" size={22} />
+          </span>
+        </div>
       </header>
 
       {error && (
-        <p className="rounded-lg bg-red-900/50 border border-red-500 px-3 py-2 text-sm">
-          {error}
+        <p role="alert" className="alert alert-error">
+          <Icon name="alert-circle" size={18} className="mt-0.5" />
+          <span>{error}</span>
         </p>
       )}
 
-      <Link to="/matches" className="text-red-200 underline">
-        Find people to learn from →
-      </Link>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Link
+          to="/matches"
+          className="card card-lavender flex items-center justify-between gap-4 transition-colors hover:bg-[#e2cbfb]"
+        >
+          <span className="flex items-center gap-3 font-semibold">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
+              <Icon name="users" size={19} />
+            </span>
+            Find people to learn from
+          </span>
+          <Icon name="arrow-right" size={20} />
+        </Link>
+
+        <Link
+          to="/leaderboard"
+          className="card card-periwinkle flex items-center justify-between gap-4 transition-colors hover:bg-[#c3d2ff]"
+        >
+          <span className="flex items-center gap-3 font-semibold">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
+              <Icon name="trophy" size={19} />
+            </span>
+            Leaderboard &amp; badges
+          </span>
+          <Icon name="arrow-right" size={20} />
+        </Link>
+      </div>
 
       <section>
-        <h2 className="text-xl font-semibold mb-3">My sessions</h2>
+        <h2 className="section-title mb-4 flex items-center gap-2">
+          <Icon name="calendar" size={20} />
+          My sessions
+        </h2>
 
         {sessions.length === 0 && (
-          <p className="text-slate-400 text-sm">No sessions yet.</p>
+          <p className="card flex items-center gap-2 text-sm text-muted">
+            <Icon name="calendar" size={16} />
+            No sessions yet.
+          </p>
         )}
 
         <ul className="space-y-3">
@@ -123,38 +174,43 @@ export default function DashboardPage() {
             return (
               <li
                 key={s.id}
-                className={`${card} flex flex-wrap justify-between items-center gap-3`}
+                className={`${card} flex flex-wrap items-center justify-between gap-4`}
               >
-                <div>
-                  <p className="font-semibold">
+                <div className="min-w-0">
+                  <p className="card-title">
                     {s.skillName} —{" "}
                     {isProvider
                       ? `teaching ${s.learnerName}`
                       : `learning from ${s.providerName}`}
                   </p>
 
-                  <p className="text-sm text-slate-400">
-                    {s.sessionTime
-                      ? new Date(s.sessionTime).toLocaleString()
-                      : "no time set"}{" "}
-                    · {s.status}
+                  <p className="meta mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Icon name="clock" size={14} />
+                      {s.sessionTime
+                        ? new Date(s.sessionTime).toLocaleString()
+                        : "no time set"}
+                    </span>
+                    <span className={badgeClass(s.status)}>{s.status}</span>
                   </p>
                 </div>
 
-                <div className="flex gap-2 items-center">
+                <div className="flex flex-wrap items-center gap-2">
                   {isProvider && open && (
                     <>
                       <button
                         onClick={() => handleStatus(s.id, "ACCEPTED")}
-                        className={`${btn} bg-green-300 text-slate-900`}
+                        className={`${btn} btn-primary`}
                       >
+                        <Icon name="check" size={14} />
                         Accept
                       </button>
 
                       <button
                         onClick={() => handleStatus(s.id, "REJECTED")}
-                        className={`${btn} border border-slate-600`}
+                        className={`${btn} btn-secondary`}
                       >
+                        <Icon name="x" size={14} />
                         Reject
                       </button>
                     </>
@@ -163,8 +219,9 @@ export default function DashboardPage() {
                   {isProvider && s.status === "ACCEPTED" && (
                     <button
                       onClick={() => handleStatus(s.id, "COMPLETED")}
-                      className={`${btn} bg-red-200 text-slate-900`}
+                      className={`${btn} btn-primary`}
                     >
+                      <Icon name="circle-check" size={14} />
                       Mark completed
                     </button>
                   )}
@@ -172,8 +229,9 @@ export default function DashboardPage() {
                   {isLearner && (open || s.status === "ACCEPTED") && (
                     <button
                       onClick={() => handleStatus(s.id, "CANCELLED")}
-                      className={`${btn} border border-slate-600`}
+                      className={`${btn} btn-secondary`}
                     >
+                      <Icon name="x" size={14} />
                       Cancel
                     </button>
                   )}
@@ -187,20 +245,24 @@ export default function DashboardPage() {
                           comment: "",
                         });
                       }}
-                      className={`${btn} bg-red-200 text-slate-900`}
+                      className={`${btn} btn-primary`}
                     >
+                      <Icon name="star" size={14} />
                       Leave a review
                     </button>
                   )}
 
                   {isLearner && s.status === "COMPLETED" && s.reviewed && (
-                    <span className="text-sm text-green-300">Reviewed ✓</span>
+                    <span className="badge badge-success">
+                      <Icon name="check" size={12} strokeWidth={3} />
+                      Reviewed
+                    </span>
                   )}
                 </div>
 
                 {canReview && reviewing === s.id && (
-                  <div className="w-full space-y-3 border-t border-slate-700 pt-3">
-                    <p className="text-sm text-slate-300">
+                  <div className="w-full space-y-3 border-t border-line pt-4">
+                    <p className="text-sm text-muted">
                       How was your session with {s.providerName}?
                     </p>
 
@@ -216,19 +278,18 @@ export default function DashboardPage() {
                           role="radio"
                           aria-checked={review.rating === n}
                           aria-label={`${n} star${n > 1 ? "s" : ""}`}
+                          title={`${n} star${n > 1 ? "s" : ""}`}
                           onClick={() =>
                             setReview({
                               ...review,
                               rating: n,
                             })
                           }
-                          className={`text-3xl leading-none cursor-pointer ${
-                            n <= review.rating
-                              ? "text-yellow-300"
-                              : "text-slate-600"
+                          className={`rounded-full p-1 transition-colors hover:bg-surface ${
+                            n <= review.rating ? "text-brand" : "text-[#c9c7c0]"
                           }`}
                         >
-                          ★
+                          <Icon name="star" size={28} filled />
                         </button>
                       ))}
                     </div>
@@ -244,20 +305,21 @@ export default function DashboardPage() {
                           comment: e.target.value,
                         })
                       }
-                      className="w-full rounded-lg bg-slate-900 border border-slate-600 px-3 py-2 text-sm outline-none focus:border-red-200"
+                      className="textarea"
                     />
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => submitReview(s.id)}
-                        className={`${btn} bg-red-200 text-slate-900`}
+                        className={`${btn} btn-primary`}
                       >
+                        <Icon name="send" size={14} />
                         Submit review
                       </button>
 
                       <button
                         onClick={() => setReviewing(null)}
-                        className={`${btn} border border-slate-600`}
+                        className={`${btn} btn-secondary`}
                       >
                         Cancel
                       </button>

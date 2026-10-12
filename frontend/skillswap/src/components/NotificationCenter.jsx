@@ -7,6 +7,7 @@ import {
 } from "../api/notificationApi";
 import { useFetch } from "../hooks/useFetch";
 import { usePolling } from "../hooks/usePolling";
+import Icon from "./Icon";
 
 const POLL_MS = 15_000;
 
@@ -73,44 +74,40 @@ export default function NotificationCenter() {
         }}
         aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`}
         aria-expanded={open}
-        className="relative cursor-pointer"
+        title="Notifications"
+        className="btn-icon relative"
       >
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-          <path d="M13.7 21a2 2 0 0 1-3.4 0" />
-        </svg>
+        <Icon name="bell" size={19} />
         {unreadCount > 0 && (
-          <span className="absolute -top-2 -right-2 min-w-4 h-4 px-1 rounded-full bg-red-500 text-[10px] font-bold flex items-center justify-center">
+          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-h-96 overflow-y-auto rounded-xl bg-slate-800 border border-slate-700 shadow-xl z-40">
-          <div className="flex items-center justify-between p-3 border-b border-slate-700">
-            <h3 className="font-semibold text-sm">Notifications</h3>
+        <div className="z-40 max-h-96 overflow-y-auto rounded-3xl border border-line bg-white shadow-lg max-sm:fixed max-sm:inset-x-3 max-sm:top-20 sm:absolute sm:right-0 sm:mt-2 sm:w-80">
+          <div className="flex items-center justify-between border-b border-line px-4 py-3">
+            <h3 className="flex items-center gap-2 text-sm font-bold">
+              <Icon name="bell" size={15} />
+              Notifications
+            </h3>
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-xs text-red-200 cursor-pointer"
+                className="flex items-center gap-1 text-xs font-semibold text-brand hover:text-brand-dark"
               >
+                <Icon name="check" size={13} />
                 Mark all read
               </button>
             )}
           </div>
 
           {items.length === 0 ? (
-            <p className="p-4 text-sm text-slate-400">You're all caught up.</p>
+            <p className="flex items-center gap-2 p-4 text-sm text-muted">
+              <Icon name="circle-check" size={16} />
+              You're all caught up.
+            </p>
           ) : (
             <ul>
               {items.map((n) => (
@@ -121,15 +118,15 @@ export default function NotificationCenter() {
                       if (!n.seen) markRead(n.id);
                       setOpen(false);
                     }}
-                    className={`block px-3 py-2 text-sm hover:bg-slate-700 ${
-                      n.seen ? "text-slate-400" : "bg-slate-700/50"
+                    className={`block px-4 py-3 text-sm hover:bg-surface ${
+                      n.seen ? "text-muted" : "bg-periwinkle/40 text-ink"
                     }`}
                   >
                     {!n.seen && (
-                      <span className="inline-block w-2 h-2 rounded-full bg-red-400 mr-2" />
+                      <span className="mr-2 inline-block h-2 w-2 rounded-full bg-brand" />
                     )}
                     {n.message}
-                    <span className="block text-xs text-slate-500 mt-0.5">
+                    <span className="mt-0.5 block text-xs text-muted">
                       {timeAgo(n.createdAt)}
                     </span>
                   </Link>
