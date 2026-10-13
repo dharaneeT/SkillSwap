@@ -10,10 +10,14 @@ function nowForInput() {
   return d.toISOString().slice(0, 16);
 }
 
+// NEW: allowed session lengths (backend accepts 15-180)
+const DURATIONS = [15, 30, 45, 60, 90];
+
 export default function BookingModal({ provider, skill, onClose, onBooked }) {
   const dispatch = useDispatch();
   const [min] = useState(nowForInput);
   const [time, setTime] = useState("");
+  const [duration, setDuration] = useState(30); // NEW
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null); // { message, status }
   const [done, setDone] = useState(false);
@@ -38,6 +42,7 @@ export default function BookingModal({ provider, skill, onClose, onBooked }) {
           providerId: provider.id,
           skillId: skill.id,
           sessionTime: time, // e.g. 2026-10-07T14:30, parsed as LocalDateTime
+          durationMinutes: duration, // NEW
         }),
       ).unwrap();
       setDone(true);
@@ -118,6 +123,25 @@ export default function BookingModal({ provider, skill, onClose, onBooked }) {
               />
             </label>
 
+            {/* NEW: duration */}
+            <label className="block text-sm font-medium">
+              <span className="flex items-center gap-2">
+                <Icon name="clock" size={15} />
+                Duration
+              </span>
+              <select
+                value={duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+                className="input select mt-2"
+              >
+                {DURATIONS.map((m) => (
+                  <option key={m} value={m}>
+                    {m} minutes
+                  </option>
+                ))}
+              </select>
+            </label>
+
             {error && (
               <div
                 role="alert"
@@ -136,11 +160,7 @@ export default function BookingModal({ provider, skill, onClose, onBooked }) {
             )}
 
             <div className="flex flex-wrap justify-end gap-2 pt-1">
-              <button
-                type="button"
-                onClick={onClose}
-                className="btn btn-ghost"
-              >
+              <button type="button" onClick={onClose} className="btn btn-ghost">
                 Cancel
               </button>
               <button disabled={submitting} className="btn btn-primary">

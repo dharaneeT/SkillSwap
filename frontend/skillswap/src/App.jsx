@@ -9,8 +9,11 @@ import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
 import AdminPage from "./pages/AdminPage";
 import SkillsListPage from "./pages/SkillsListPage";
-import LeaderboardPage from "./pages/LeaderboardPage";
 import MatchesPage from "./pages/MatchesPage";
+import LeaderboardPage from "./pages/LeaderboardPage";
+import OnboardingPage from "./pages/OnboardingPage"; // NEW
+import CertificatesPage from "./pages/CertificatesPage"; // NEW
+import CertificateViewPage from "./pages/CertificateViewPage"; // NEW
 
 function App() {
   return (
@@ -31,6 +34,10 @@ function App() {
           <Route path="/chat/:userId" element={<ChatPage />} />
           <Route path="/matches" element={<MatchesPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
+          {/* NEW */}
+          <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/certificates" element={<CertificatesPage />} />
+          <Route path="/certificates/:code" element={<CertificateViewPage />} />
         </Route>
 
         {/* admins only */}

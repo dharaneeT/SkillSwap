@@ -27,7 +27,7 @@ export default function SignupPage() {
     setLoading(true);
     try {
       await signup(form);
-      navigate("/skills", { replace: true });
+      navigate("/onboarding", { replace: true }); // NEW: was "/skills"
     } catch (err) {
       setError(getErrorMessage(err)); // e.g. "Email is already registered"
     } finally {

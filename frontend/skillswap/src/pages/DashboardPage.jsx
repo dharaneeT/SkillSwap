@@ -191,11 +191,26 @@ export default function DashboardPage() {
                         ? new Date(s.sessionTime).toLocaleString()
                         : "no time set"}
                     </span>
+                    {/* NEW: session length */}
+                    {s.durationMinutes && <span>{s.durationMinutes} min</span>}
                     <span className={badgeClass(s.status)}>{s.status}</span>
                   </p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
+                  {/* NEW: video call link, created by the backend when the session is accepted */}
+                  {s.status === "ACCEPTED" && s.meetingLink && (
+                    <a
+                      href={s.meetingLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${btn} btn-tint`}
+                    >
+                      <Icon name="arrow-right" size={14} />
+                      Join call
+                    </a>
+                  )}
+
                   {isProvider && open && (
                     <>
                       <button

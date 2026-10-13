@@ -37,4 +37,17 @@ public class Session {
 
 	@Column(nullable = false, columnDefinition = "boolean default false")
 	private boolean reminderSent = false;
+
+	// NEW: session length and video call link
+	private Integer durationMinutes = 30;
+	private String meetingLink;
+
+	@PrePersist
+	@PreUpdate
+	void ensureMeetingDefaults() {
+		if (durationMinutes == null) durationMinutes = 30;
+		if (status == SessionStatus.ACCEPTED && (meetingLink == null || meetingLink.isBlank())) {
+			meetingLink = "https://meet.jit.si/SkillSwap-" + java.util.UUID.randomUUID().toString().replace("-", "");
+		}
+	}
 }

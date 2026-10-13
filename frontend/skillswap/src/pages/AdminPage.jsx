@@ -13,6 +13,7 @@ import {
 } from "../api/adminApi";
 import { getErrorMessage } from "../api/axios";
 import Icon from "../components/Icon";
+import SkillModeration from "../components/admin/SkillModeration"; // NEW
 
 // this const was missing before -> "btn is not defined" crash
 const btn = "btn btn-secondary btn-sm";
@@ -140,7 +141,12 @@ export default function AdminPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <Stat label="Users" value={users.length} tone="card-lavender" icon="users" />
+        <Stat
+          label="Users"
+          value={users.length}
+          tone="card-lavender"
+          icon="users"
+        />
         <Stat
           label="Active"
           value={activeCount}
@@ -173,6 +179,9 @@ export default function AdminPage() {
           <span>{notice}</span>
         </p>
       )}
+
+      {/* NEW: approve new skills / merge duplicates */}
+      <SkillModeration onChanged={() => dispatch(loadSkills(true))} />
 
       <section>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">

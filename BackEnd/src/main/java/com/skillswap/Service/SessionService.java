@@ -117,6 +117,8 @@ public class SessionService {
 		s.setLearner(me);
 		s.setSkill(skill);
 		s.setSessionTime(dto.getSessionTime());
+		// NEW
+		s.setDurationMinutes(dto.getDurationMinutes() != null ? dto.getDurationMinutes() : 30);
 		s.setStatus(SessionStatus.PENDING);
 
 		Session saved = sessionRepository.save(s);
@@ -353,7 +355,6 @@ public class SessionService {
 	private String skillName(Session s) {
 		return s.getSkill() != null ? s.getSkill().getName() : "your skill";
 	}
-
 
 	private SessionResponseDTO toDto(Session s) {
 		SessionResponseDTO d = new SessionResponseDTO();

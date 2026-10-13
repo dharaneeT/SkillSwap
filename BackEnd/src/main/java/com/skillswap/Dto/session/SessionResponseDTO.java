@@ -20,4 +20,7 @@ public class SessionResponseDTO {
 	private Integer learnerId; // NEW
 
 	private boolean reviewed;
+	// NEW
+	private Integer durationMinutes;
+	private String meetingLink;
 }
