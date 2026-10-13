@@ -7,6 +7,9 @@ import { useFetch } from "../hooks/useFetch";
 import { markChatRead } from "../api/notificationApi";
 import { useChatSocket } from "../hooks/useChatSocket";
 import Icon from "../components/Icon";
+import PresenceDot from "../components/PresenceDot"; // NEW
+import { usePresence } from "../hooks/usePresence"; // NEW
+import { presenceText } from "../utils/presence"; // NEW
 
 export default function ChatPage() {
   const { userId } = useParams(); // undefined on /chat
@@ -78,6 +81,9 @@ export default function ChatPage() {
   const sidebar = [...pinned, ...partners];
   const active = sidebar.find((p) => p.id === activeId);
 
+  // NEW: { [userId]: { online, lastSeenAt } } for everyone in the sidebar, refreshed every 20s
+  const presence = usePresence(sidebar.map((p) => p.id));
+
   const openChat = (id) => {
     setUnread((u) => ({ ...u, [id]: 0 }));
     setError("");
@@ -135,16 +141,30 @@ export default function ChatPage() {
               key={p.id}
               onClick={() => openChat(p.id)}
               className={`flex w-full items-center justify-between gap-3 rounded-full px-3 py-2 text-left text-sm font-medium transition-colors ${
-                p.id === activeId
-                  ? "bg-periwinkle text-navy"
-                  : "hover:bg-white"
+                p.id === activeId ? "bg-periwinkle text-navy" : "hover:bg-white"
               }`}
             >
               <span className="flex min-w-0 items-center gap-2.5">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lavender text-xs font-bold uppercase">
-                  {p.name?.[0] ?? <Icon name="user" size={14} />}
+                {/* NEW: green dot when online */}
+                <span className="relative shrink-0">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-lavender text-xs font-bold uppercase">
+                    {p.name?.[0] ?? <Icon name="user" size={14} />}
+                  </span>
+                  {presence[p.id] && (
+                    <PresenceDot online={presence[p.id].online} />
+                  )}
                 </span>
-                <span className="truncate">{p.name}</span>
+                <span className="min-w-0">
+                  <span className="block truncate">{p.name}</span>
+                  {/* NEW: "Online" or "Last seen 5 min ago" */}
+                  <span
+                    className={`block truncate text-[11px] font-normal ${
+                      presence[p.id]?.online ? "text-[#17623a]" : "text-muted"
+                    }`}
+                  >
+                    {presenceText(presence[p.id])}
+                  </span>
+                </span>
               </span>
               {unread[p.id] > 0 && (
                 <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">
@@ -166,12 +186,32 @@ export default function ChatPage() {
           </div>
         ) : (
           <>
-            <h2 className="flex items-center gap-3 border-b border-line px-5 py-4 font-bold">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-lavender text-sm font-bold uppercase">
-                {active?.name?.[0] ?? <Icon name="user" size={16} />}
+            {/* NEW: header shows the partner's presence under their name */}
+            <div className="flex items-center gap-3 border-b border-line px-5 py-4">
+              <span className="relative shrink-0">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-lavender text-sm font-bold uppercase">
+                  {active?.name?.[0] ?? <Icon name="user" size={16} />}
+                </span>
+                {presence[activeId] && (
+                  <PresenceDot online={presence[activeId].online} />
+                )}
               </span>
-              {active?.name ?? "Chat"}
-            </h2>
+              <div className="min-w-0">
+                <h2 className="truncate font-bold leading-tight">
+                  {active?.name ?? "Chat"}
+                </h2>
+                <p
+                  aria-live="polite"
+                  className={`text-xs ${
+                    presence[activeId]?.online
+                      ? "font-semibold text-[#17623a]"
+                      : "text-muted"
+                  }`}
+                >
+                  {presenceText(presence[activeId])}
+                </p>
+              </div>
+            </div>
             {(error || historyError) && (
               <p role="alert" className="alert alert-error m-3">
                 <Icon name="alert-circle" size={18} className="mt-0.5" />

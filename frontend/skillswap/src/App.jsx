@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/Header";
+import { useAuth } from "./hooks/useAuth"; // NEW
+import { useHeartbeat } from "./hooks/useHeartbeat"; // NEW
 import ProtectedRoute from "./components/ProtectedRoute"; // lowercase "components"
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -11,11 +13,14 @@ import AdminPage from "./pages/AdminPage";
 import SkillsListPage from "./pages/SkillsListPage";
 import MatchesPage from "./pages/MatchesPage";
 import LeaderboardPage from "./pages/LeaderboardPage";
-import OnboardingPage from "./pages/OnboardingPage"; // NEW
-import CertificatesPage from "./pages/CertificatesPage"; // NEW
-import CertificateViewPage from "./pages/CertificateViewPage"; // NEW
+import OnboardingPage from "./pages/OnboardingPage";
+import CertificatesPage from "./pages/CertificatesPage";
+import CertificateViewPage from "./pages/CertificateViewPage";
 
 function App() {
+  const { isAuthenticated } = useAuth(); // NEW
+  useHeartbeat(isAuthenticated); // NEW: tells the server "I'm online" every 30s while logged in
+
   return (
     <div className="min-h-screen bg-cream font-sans text-ink">
       <Header />
@@ -34,7 +39,6 @@ function App() {
           <Route path="/chat/:userId" element={<ChatPage />} />
           <Route path="/matches" element={<MatchesPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
-          {/* NEW */}
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/certificates/:code" element={<CertificateViewPage />} />
