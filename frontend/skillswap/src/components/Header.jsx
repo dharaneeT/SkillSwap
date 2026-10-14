@@ -7,6 +7,7 @@ import Icon from "./Icon";
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: "layout-dashboard" },
   { to: "/skills", label: "Skills", icon: "book-open" },
+  { to: "/roadmaps", label: "Roadmaps", icon: "trending-up" },
   { to: "/chat", label: "Chat", icon: "message-circle" },
   { to: "/matches", label: "Matches", icon: "users" },
   { to: "/profile", label: "Profile", icon: "user" },

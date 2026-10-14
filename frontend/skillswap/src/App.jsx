@@ -16,6 +16,9 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import CertificatesPage from "./pages/CertificatesPage";
 import CertificateViewPage from "./pages/CertificateViewPage";
+import RoadmapsPage from "./pages/RoadmapsPage";
+import RoadmapCreatePage from "./pages/RoadmapCreatePage";
+import RoadmapDetailPage from "./pages/RoadmapDetailPage";
 
 function App() {
   const { isAuthenticated } = useAuth(); // NEW
@@ -42,6 +45,9 @@ function App() {
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/certificates/:code" element={<CertificateViewPage />} />
+          <Route path="/roadmaps" element={<RoadmapsPage />} />
+          <Route path="/roadmaps/new" element={<RoadmapCreatePage />} />
+          <Route path="/roadmaps/:id" element={<RoadmapDetailPage />} />
         </Route>
 
         {/* admins only */}
