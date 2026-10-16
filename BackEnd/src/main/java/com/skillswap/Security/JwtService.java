@@ -66,6 +66,7 @@ public class JwtService {
 	public int getExpirationMs() {
 		return expirationMs;
 	}
+	/////////////////////////////////////////////////////////////////////////////
 	//	@Value("${jwt.expiration-ms}")
 	//	//	private Integer expiration;
 	//

@@ -8,6 +8,7 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: "layout-dashboard" },
   { to: "/skills", label: "Skills", icon: "book-open" },
   { to: "/roadmaps", label: "Roadmaps", icon: "trending-up" },
+  { to: "/study-rooms", label: "Study Rooms", icon: "graduation-cap" },
   { to: "/chat", label: "Chat", icon: "message-circle" },
   { to: "/matches", label: "Matches", icon: "users" },
   { to: "/profile", label: "Profile", icon: "user" },
@@ -48,7 +49,7 @@ function Header() {
             <>
               <nav
                 aria-label="Main"
-                className="hidden items-center gap-1 lg:flex"
+                className="hidden items-center gap-1 xl:flex"
               >
                 {NAV.map((n) => (
                   <NavLink key={n.to} to={n.to} className={linkClass}>
@@ -67,7 +68,7 @@ function Header() {
               <div className="flex items-center gap-2">
                 <NotificationCenter />
                 <span
-                  className="hidden max-w-48 items-center gap-2 truncate rounded-full bg-surface px-3 py-2 text-xs font-medium text-muted xl:inline-flex"
+                  className="hidden max-w-48 items-center gap-2 truncate rounded-full bg-surface px-3 py-2 text-xs font-medium text-muted 2xl:inline-flex"
                   title={user.email}
                 >
                   <Icon name="user" size={14} />
@@ -75,7 +76,7 @@ function Header() {
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="btn btn-secondary btn-sm hidden lg:inline-flex"
+                  className="btn btn-secondary btn-sm hidden xl:inline-flex"
                 >
                   <Icon name="log-out" size={15} />
                   Logout
@@ -86,7 +87,7 @@ function Header() {
                   aria-label={menuOpen ? "Close menu" : "Open menu"}
                   aria-expanded={menuOpen}
                   title={menuOpen ? "Close menu" : "Open menu"}
-                  className="btn-icon lg:hidden"
+                  className="btn-icon xl:hidden"
                 >
                   <Icon name={menuOpen ? "x" : "menu"} size={20} />
                 </button>
@@ -108,7 +109,7 @@ function Header() {
         {user && menuOpen && (
           <nav
             aria-label="Mobile"
-            className="mt-3 flex flex-col gap-1 border-t border-line pt-3 lg:hidden"
+            className="mt-3 flex flex-col gap-1 border-t border-line pt-3 xl:hidden"
           >
             {NAV.map((n) => (
               <NavLink

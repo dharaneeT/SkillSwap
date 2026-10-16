@@ -19,6 +19,8 @@ import CertificateViewPage from "./pages/CertificateViewPage";
 import RoadmapsPage from "./pages/RoadmapsPage";
 import RoadmapCreatePage from "./pages/RoadmapCreatePage";
 import RoadmapDetailPage from "./pages/RoadmapDetailPage";
+import StudyRoomsPage from "./pages/StudyRoomsPage";
+import StudyRoomPage from "./pages/StudyRoomPage";
 
 function App() {
   const { isAuthenticated } = useAuth(); // NEW
@@ -48,6 +50,8 @@ function App() {
           <Route path="/roadmaps" element={<RoadmapsPage />} />
           <Route path="/roadmaps/new" element={<RoadmapCreatePage />} />
           <Route path="/roadmaps/:id" element={<RoadmapDetailPage />} />
+          <Route path="/study-rooms" element={<StudyRoomsPage />} />
+          <Route path="/study-rooms/:id" element={<StudyRoomPage />} />
         </Route>
 
         {/* admins only */}

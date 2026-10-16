@@ -7,3 +7,4 @@ export const fetchReviewsForUser = (userId, page = 0) =>
 
 export const fetchMyWrittenReviews = (page = 0) =>
   api.get("/review/my", { params: { page } });
+ 
